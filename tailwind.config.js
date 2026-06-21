@@ -7,6 +7,11 @@ export default {
     "bg-purple",
     "bg-coral",
     "bg-yellow",
+    "bg-mint/70",
+    "bg-blue/70",
+    "bg-purple/70",
+    "bg-coral/70",
+    "bg-yellow/80",
     "bg-mint/10",
     "bg-blue/10",
     "bg-purple/10",
@@ -53,12 +58,13 @@ export default {
         yellow: "#FFC857",
         ink: "#0F172A",
         sub: "#64748B",
-        bg: "#FAFAF7",
+        bg: "#FFFFFF",
       },
       boxShadow: {
         soft: "0 18px 45px rgba(30, 42, 62, 0.10)",
         lift: "0 12px 26px rgba(91, 141, 239, 0.16)",
-        card: "0 10px 28px rgba(15, 23, 42, 0.07)",
+        card: "0 8px 24px rgba(15, 23, 42, 0.07)",
+        tab: "0 -10px 28px rgba(15, 23, 42, 0.08)",
       },
       fontFamily: {
         sans: [

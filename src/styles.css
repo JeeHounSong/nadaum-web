@@ -10,7 +10,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #fafaf7;
+  background: #f8fafc;
 }
 
 button {
@@ -45,7 +45,7 @@ button {
   justify-content: center;
   gap: 10px;
   border-radius: 18px;
-  background: #f1f5f9;
+  background: #f8fafc;
   color: #0f172a;
   font-size: 15px;
   font-weight: 900;
@@ -65,6 +65,33 @@ button {
   font-weight: 900;
 }
 
+.google-btn {
+  display: flex;
+  min-height: 52px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.google-dot {
+  display: inline-flex;
+  height: 22px;
+  width: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #5b8def;
+  font-weight: 900;
+}
+
 .icon-btn {
   display: flex;
   height: 42px;
@@ -78,8 +105,8 @@ button {
 
 .floating-action {
   position: fixed;
-  left: calc(50% + 126px);
-  bottom: 92px;
+  left: calc(50% + 132px);
+  bottom: 112px;
   display: flex;
   height: 54px;
   width: 54px;
@@ -89,6 +116,7 @@ button {
   background: #4cc9a0;
   color: white;
   box-shadow: 0 16px 28px rgba(76, 201, 160, 0.28);
+  z-index: 35;
 }
 
 .app-scroll {
@@ -110,6 +138,23 @@ button {
     linear-gradient(rgba(91, 141, 239, 0.09) 1px, transparent 1px),
     linear-gradient(90deg, rgba(91, 141, 239, 0.09) 1px, transparent 1px);
   background-size: 28px 28px;
+}
+
+.modal-input {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 14px 16px;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  outline: none;
+}
+
+.modal-input:focus {
+  border-color: #4cc9a0;
+  background: #ffffff;
 }
 
 @media (max-width: 430px) {
