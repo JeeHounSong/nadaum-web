@@ -120,9 +120,9 @@ const similarPeople = [
   { id: "harin", name: "하린", avatar: avatars[3], status: "응원이 필요함", tags: ["독서", "마음"], type: "감정 정리형" },
 ];
 const initialTodayPosts = [
-  { id: 1, mood: "😐", text: "오늘 점심은 편의점 도시락. 이번 달은 조금 아껴야겠다.", tag: "생활", empathy: 24, same: 8, cheer: 12 },
-  { id: 2, mood: "😔", text: "오늘도 서류 탈락했다. 그래도 내일 하나 더 넣어볼 생각이다.", tag: "취업", empathy: 41, same: 19, cheer: 23 },
-  { id: 3, mood: "🙂", text: "자취방 전구를 혼자 갈았다. 별거 아닌데 조금 뿌듯했다.", tag: "자취", empathy: 35, same: 10, cheer: 17 },
+  { id: 1, mood: "😐", text: "오늘 점심은 편의점 도시락. 이번 달은 조금 아껴야겠다.", tag: "생활", empathy: 24, same: 8, cheer: 12, photo: "", comments: ["오늘도 수고했어요."] },
+  { id: 2, mood: "😔", text: "오늘도 서류 탈락했다. 그래도 내일 하나 더 넣어볼 생각이다.", tag: "취업", empathy: 41, same: 19, cheer: 23, photo: "", comments: ["저도 비슷한 경험 했어요.", "응원합니다."] },
+  { id: 3, mood: "🙂", text: "자취방 전구를 혼자 갈았다. 별거 아닌데 조금 뿌듯했다.", tag: "자취", empathy: 35, same: 10, cheer: 17, photo: "", comments: [] },
 ];
 
 const supportItems = [
@@ -576,6 +576,9 @@ function MobileShell(props) {
     activityLog: ActivityLogScreen,
     meetingReview: MeetingReviewScreen,
     similarProfile: SimilarProfileScreen,
+    connection: ConnectionScreen,
+    growth: GrowthScreen,
+    ourToday: OurTodayScreen,
     psychTest: PsychTestScreen,
   };
   const Screen = props.detail ? detailScreens[props.detail.type] : mainScreens[props.activeTab] || HomeScreen;
@@ -595,7 +598,7 @@ function MobileShell(props) {
   );
 }
 
-function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups, verified, mission, attendance, setAttendance, setEarnedBadges, addXp, addActivity, currentStatus, setCurrentStatus, encouragementIndex, setEncouragementIndex, encouragementClaimed, setEncouragementClaimed }) {
+function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups, todayPosts }) {
   const recommendations = [
     { title: "월세 지원 신청 기간", desc: "서울시 청년 월세 지원", icon: WalletCards, color: "mint", tab: "support" },
     { title: "낯가림 적은 커피챗", desc: "6.29 월 · 홍대입구", icon: Coffee, color: "coral", tab: "meetups" },
@@ -608,42 +611,7 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
     { label: "심리상담", icon: HeartHandshake, color: "coral", run: () => setDetail({ type: "psychTest" }) },
   ];
   const joinedPreview = meetups.filter((item) => joinedMeetups.includes(item.id)).slice(0, 2);
-  const missionItems = [
-    { label: "청년 인증", done: verified },
-    { label: "관심사 설정", done: user.tags.length > 0 },
-    { label: "심리테스트 완료", done: mission.psych },
-    { label: "첫 게시글 작성", done: mission.firstPost },
-    { label: "첫 모임 참여", done: mission.firstMeeting },
-  ];
-  const missionPercent = Math.round((missionItems.filter((item) => item.done).length / missionItems.length) * 100);
-  const checkAttendance = () => {
-    if (attendance.checkedToday) return;
-    setAttendance((prev) => {
-      const nextStreak = prev.streak + 1;
-      const newBadges = [...prev.badges];
-      if (nextStreak >= 7 && !newBadges.includes("7일 출석 배지")) newBadges.push("7일 출석 배지");
-      if (nextStreak >= 14 && !newBadges.includes("14일 출석 배지")) newBadges.push("14일 출석 배지");
-      if (nextStreak >= 30 && !newBadges.includes("30일 출석 배지")) newBadges.push("30일 출석 배지");
-      if (nextStreak >= 1 && !newBadges.includes("꾸준함 배지")) newBadges.push("꾸준함 배지");
-      newBadges.forEach((badge) => setEarnedBadges((prevBadges) => (prevBadges.includes(badge) ? prevBadges : [...prevBadges, badge])));
-      return { streak: nextStreak, checkedToday: true, badges: newBadges };
-    });
-    addActivity("오늘 출석체크를 완료했어요.");
-    addXp("출석 완료", 5);
-  };
-  const updateStatus = (status) => {
-    setCurrentStatus(status);
-    addActivity("현재 상태를 업데이트했어요.");
-    addXp("현재 상태 업데이트", 5);
-  };
-  const nextEncouragement = () => {
-    setEncouragementIndex((value) => (value + 1) % encouragements.length);
-    if (!encouragementClaimed) {
-      setEncouragementClaimed(true);
-      addActivity("오늘의 응원을 확인했어요.");
-      addXp("오늘의 응원 확인", 2);
-    }
-  };
+  const todayPreview = todayPosts[1] || todayPosts[0];
 
   return (
     <PagePadding>
@@ -663,37 +631,6 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
           </div>
         </div>
       </button>
-      <StatusCard currentStatus={currentStatus} onSelect={updateStatus} />
-      <EncouragementCard text={encouragements[encouragementIndex]} onNext={nextEncouragement} />
-      <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-base font-black text-ink">오늘 출석하기</p>
-            <p className="mt-1 text-xs font-bold text-sub">현재 연속 출석: {attendance.streak}일</p>
-          </div>
-          <button className={`rounded-full px-4 py-2 text-xs font-black ${attendance.checkedToday ? "bg-slate-100 text-sub" : "bg-mint text-white"}`} type="button" onClick={checkAttendance}>
-            {attendance.checkedToday ? "오늘 출석 완료" : "출석하기"}
-          </button>
-        </div>
-        <div className="mt-3 grid grid-cols-4 gap-2">
-          {[1, 7, 14, 30].map((day) => (
-            <div key={day} className={`rounded-2xl px-2 py-2 text-center text-[11px] font-black ${attendance.streak >= day ? "bg-mint/10 text-mint" : "bg-slate-50 text-sub"}`}>{day}일</div>
-          ))}
-        </div>
-      </section>
-      <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-base font-black text-ink">🌱 나다움 시작하기</p>
-            <p className="mt-1 text-xs font-bold text-mint">{mission.completed ? "🎉 나다움 첫걸음 완료" : `${missionPercent}% 완료`}</p>
-          </div>
-          <Award className="text-yellow" size={24} />
-        </div>
-        <ProgressBar value={missionPercent} color="mint" compact />
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          {missionItems.map((item) => <p key={item.label} className={`text-xs font-black ${item.done ? "text-mint" : "text-sub"}`}>{item.done ? "☑" : "□"} {item.label}</p>)}
-        </div>
-      </section>
       <section className="mt-3 grid grid-cols-5 gap-2 rounded-[24px] bg-white p-3 shadow-card">
         {shortcuts.map((item) => {
           const Icon = item.icon;
@@ -720,28 +657,24 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
       <div className="space-y-2.5">
         {recommendations.map((item) => <ActionPanel key={item.title} {...item} onClick={() => setActiveTab(item.tab)} />)}
       </div>
-      <SimilarPeopleSection onOpen={(person) => setDetail({ type: "similarProfile", personId: person.id })} />
-      <SectionHeader title="오늘의 활동" action="전체보기" onClick={() => setDetail({ type: "walkDetail" })} />
-      <div className="grid grid-cols-2 gap-3">
-        <ActivityCard
-          image={A.walk}
-          title="걸음 챌린지"
-          value="5,300보"
-          desc="목표 10,000보"
-          color="mint"
-          progress={53}
-          onClick={() => setDetail({ type: "walkDetail" })}
-        />
-        <ActivityCard
-          image={A.map2}
-          fallback={A.map}
-          title="나다움 지도"
-          value="주변 모임 12개"
-          desc="내 생활권 모임 보기"
-          color="blue"
-          onClick={() => setDetail({ type: "mapDetail" })}
-        />
-      </div>
+      <SectionHeader title="오늘의 챌린지" action="기록 보기" onClick={() => setDetail({ type: "walkDetail" })} />
+      <CompactWalkCard onClick={() => setDetail({ type: "walkDetail" })} />
+      {todayPreview && (
+        <section className="mt-5 rounded-[24px] bg-white p-4 shadow-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-base font-black text-ink">우리들의 오늘</p>
+              <p className="mt-1 text-xs font-bold text-sub">성공보다 버텨낸 하루를 나눠요</p>
+            </div>
+            <button className="flex items-center text-sm font-black text-sub" type="button" onClick={() => setDetail({ type: "ourToday" })}>더보기<ChevronRight size={16} /></button>
+          </div>
+          <div className="mt-3 rounded-2xl bg-slate-50 p-3">
+            <p className="text-2xl">{todayPreview.mood}</p>
+            <p className="mt-2 line-clamp-3 text-sm font-bold leading-6 text-ink">{todayPreview.text}</p>
+            <p className="mt-2 text-xs font-black text-mint">공감 {todayPreview.empathy}</p>
+          </div>
+        </section>
+      )}
       <div className="mt-3 grid grid-cols-3 gap-2">
         <MiniStat label="참여 모임" value={`${joinedMeetups.length}개`} />
         <MiniStat label="심리 결과" value={moodResult || "대기"} />
@@ -819,35 +752,22 @@ function WalkDetailScreen({ goBack, setOverlay }) {
   );
 }
 
-function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverlay, darkMode, todayPosts, setTodayPosts, todayReacted, setTodayReacted, addXp, addActivity }) {
+function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverlay, darkMode }) {
   const [category, setCategory] = useState("전체");
-  const [todayDraft, setTodayDraft] = useState({ mood: "🙂", text: "", tag: "마음" });
-  const categories = ["전체", "질문", "정보공유", "고민상담", "자유", "우리들의 오늘"];
+  const categories = ["전체", "질문", "정보공유", "고민상담", "자유"];
   const visiblePosts = category === "전체" ? posts : posts.filter((post) => post.category === category);
   const toggleLike = (id) => setLikedPosts((prev) => (prev.includes(id) ? prev.filter((postId) => postId !== id) : [...prev, id]));
-  const addTodayPost = () => {
-    const text = todayDraft.text.trim();
-    if (!text) return;
-    setTodayPosts((prev) => [{ id: Date.now(), mood: todayDraft.mood, text, tag: todayDraft.tag, empathy: 0, same: 0, cheer: 0 }, ...prev]);
-    setTodayDraft({ mood: "🙂", text: "", tag: "마음" });
-    addActivity("우리들의 오늘에 기록을 남겼어요.");
-    addXp("우리들의 오늘 작성", 10);
-  };
-  const reactToday = (id, key) => {
-    setTodayPosts((prev) => prev.map((post) => (post.id === id ? { ...post, [key]: post[key] + 1 } : post)));
-    if (!todayReacted) {
-      setTodayReacted(true);
-      addXp("우리들의 오늘 반응", 1);
-    }
-  };
 
   return (
     <PagePadding>
       <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" onNotify={() => setDetail({ type: "notifications" })} />
+      <section className="mt-4 rounded-[26px] bg-gradient-to-br from-mint/15 via-white to-purple/15 p-4 shadow-card">
+        <p className="text-sm font-black text-mint">우리들의 오늘</p>
+        <h2 className="mt-1 text-xl font-black leading-7 text-ink">성공한 하루보다,<br />버텨낸 하루를 나눠요.</h2>
+        <p className="mt-2 text-sm font-semibold leading-5 text-sub">비교보다 공감, 과시보다 일상을 나누는 나다움 피드예요.</p>
+        <button className="mt-4 rounded-full bg-mint px-4 py-2 text-sm font-black text-white" type="button" onClick={() => setDetail({ type: "ourToday" })}>들어가기</button>
+      </section>
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
-      {category === "우리들의 오늘" ? (
-        <OurTodaySection draft={todayDraft} setDraft={setTodayDraft} posts={todayPosts} onSubmit={addTodayPost} onReact={reactToday} />
-      ) : (
       <div className="mt-4 space-y-2.5">
         {visiblePosts.length === 0 ? <EmptyCard image={A.emptySearch} text="검색 결과가 없어요" darkMode={darkMode} onClick={() => setCategory("전체")} /> : visiblePosts.map((post) => {
           const liked = likedPosts.includes(post.id);
@@ -875,7 +795,6 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
           );
         })}
       </div>
-      )}
       <button className="floating-action" type="button" aria-label="글쓰기" onClick={() => setOverlay("write")}><PenLine size={21} /></button>
     </PagePadding>
   );
@@ -1403,6 +1322,129 @@ function ActivityLogScreen({ goBack, activityLog }) {
   );
 }
 
+function ConnectionScreen({ goBack, setDetail, currentStatus, setCurrentStatus, encouragementIndex, setEncouragementIndex, encouragementClaimed, setEncouragementClaimed, addActivity, addXp }) {
+  const mapMeetups = [
+    { id: "book", title: "독서 모임", desc: "홍대 · 이번 주말" },
+    { id: "walk", title: "러닝 모임", desc: "여의나루역 · 6.24 수" },
+    { id: "coffee", title: "커피챗", desc: "홍대입구 · 6.29 월" },
+  ];
+  const updateStatus = (status) => {
+    setCurrentStatus(status);
+    addActivity("현재 상태를 업데이트했어요.");
+    addXp("현재 상태 업데이트", 5);
+  };
+  const nextEncouragement = () => {
+    setEncouragementIndex((value) => (value + 1) % encouragements.length);
+    if (!encouragementClaimed) {
+      setEncouragementClaimed(true);
+      addActivity("오늘의 응원을 확인했어요.");
+      addXp("오늘의 응원 확인", 2);
+    }
+  };
+  return (
+    <DetailPage title="연결" onBack={goBack}>
+      <p className="text-sm font-semibold leading-6 text-sub">비슷한 사람과 관심사, 모임을 통해 연결을 시작해보세요.</p>
+      <StatusCard currentStatus={currentStatus} onSelect={updateStatus} />
+      <SimilarPeopleSection onOpen={(person) => setDetail({ type: "similarProfile", personId: person.id })} />
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="나다움 지도" action="지도 보기" />
+        <img className="mt-3 h-44 w-full rounded-[22px] object-cover" src={A.map2} alt="나다움 지도" onError={(event) => { event.currentTarget.src = A.map; }} />
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="주변 모임" />
+        <div className="mt-3 space-y-2">
+          {mapMeetups.map((meetup) => <button key={meetup.id} className="flex w-full items-center justify-between rounded-2xl bg-slate-50 p-3 text-left" type="button" onClick={() => setDetail({ type: "meetingDetail", meetupId: meetup.id })}><span><span className="block text-sm font-black text-ink">{meetup.title}</span><span className="mt-1 block text-xs font-bold text-sub">{meetup.desc}</span></span><ChevronRight size={17} className="text-slate-300" /></button>)}
+        </div>
+      </section>
+      <EncouragementCard text={encouragements[encouragementIndex]} onNext={nextEncouragement} />
+    </DetailPage>
+  );
+}
+
+function GrowthScreen({ goBack, setDetail, user, verified, mission, attendance, setAttendance, setEarnedBadges, earnedBadges, activityLog, addXp, addActivity }) {
+  const missionItems = [
+    { label: "청년 인증", done: verified },
+    { label: "관심사 설정", done: user.tags.length > 0 },
+    { label: "심리테스트 완료", done: mission.psych },
+    { label: "첫 게시글 작성", done: mission.firstPost },
+    { label: "첫 모임 참여", done: mission.firstMeeting },
+  ];
+  const missionPercent = Math.round((missionItems.filter((item) => item.done).length / missionItems.length) * 100);
+  const checkAttendance = () => {
+    if (attendance.checkedToday) return;
+    setAttendance((prev) => {
+      const nextStreak = prev.streak + 1;
+      const newBadges = [...prev.badges];
+      if (nextStreak >= 7 && !newBadges.includes("7일 출석 배지")) newBadges.push("7일 출석 배지");
+      if (nextStreak >= 14 && !newBadges.includes("14일 출석 배지")) newBadges.push("14일 출석 배지");
+      if (nextStreak >= 30 && !newBadges.includes("30일 출석 배지")) newBadges.push("30일 출석 배지");
+      if (nextStreak >= 1 && !newBadges.includes("꾸준함 배지")) newBadges.push("꾸준함 배지");
+      newBadges.forEach((badge) => setEarnedBadges((prevBadges) => (prevBadges.includes(badge) ? prevBadges : [...prevBadges, badge])));
+      return { streak: nextStreak, checkedToday: true, badges: newBadges };
+    });
+    addActivity("오늘 출석체크를 완료했어요.");
+    addXp("출석 완료", 5);
+  };
+  return (
+    <DetailPage title="성장" onBack={goBack}>
+      <p className="text-sm font-semibold leading-6 text-sub">작은 기록들이 모여 나다움을 만듭니다.</p>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="출석체크" action={`${attendance.streak}일 연속`} />
+        <button className={`mt-3 w-full rounded-2xl px-4 py-3 text-sm font-black ${attendance.checkedToday ? "bg-slate-100 text-sub" : "bg-mint text-white"}`} type="button" onClick={checkAttendance}>{attendance.checkedToday ? "오늘 출석 완료" : "출석하기"}</button>
+        <div className="mt-3 grid grid-cols-4 gap-2">{[1, 7, 14, 30].map((day) => <div key={day} className={`rounded-2xl px-2 py-2 text-center text-[11px] font-black ${attendance.streak >= day ? "bg-mint/10 text-mint" : "bg-slate-50 text-sub"}`}>{day}일</div>)}</div>
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="🌱 나다움 시작하기" action={mission.completed ? "완료" : `${missionPercent}%`} />
+        <ProgressBar value={missionPercent} color="mint" compact />
+        <div className="mt-3 grid grid-cols-2 gap-2">{missionItems.map((item) => <p key={item.label} className={`text-xs font-black ${item.done ? "text-mint" : "text-sub"}`}>{item.done ? "☑" : "□"} {item.label}</p>)}</div>
+      </section>
+      <ActionPanel icon={BookOpenCheck} title="심리테스트" desc="오늘의 나를 확인해요" color="purple" onClick={() => setDetail({ type: "psychTest" })} />
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="레벨 및 XP" action={user.level} />
+        <p className="mt-3 text-xs font-bold text-sub">{user.xp.toLocaleString()} / {user.maxXp.toLocaleString()} XP</p>
+        <ProgressBar value={user.xpPercent} color="mint" />
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="배지" action={`${badges.length + earnedBadges.length}개`} />
+        <div className="mt-3 flex flex-wrap gap-2">{[...badges.map((badge) => badge.label), ...earnedBadges].map((badge) => <span key={badge} className="rounded-full bg-yellow/15 px-3 py-2 text-xs font-black text-yellow">{badge}</span>)}</div>
+      </section>
+      <RecentActivityCard items={activityLog.slice(0, 5)} onMore={() => setDetail({ type: "activityLog" })} />
+    </DetailPage>
+  );
+}
+
+function OurTodayScreen({ goBack, todayPosts, setTodayPosts, todayReacted, setTodayReacted, addXp, addActivity }) {
+  const [draft, setDraft] = useState({ mood: "🙂", text: "", tag: "마음", photo: "" });
+  const [commentDrafts, setCommentDrafts] = useState({});
+  const addTodayPost = () => {
+    const text = draft.text.trim();
+    if (!text) return;
+    setTodayPosts((prev) => [{ id: Date.now(), mood: draft.mood, text, tag: draft.tag, photo: draft.photo, empathy: 0, same: 0, cheer: 0, comments: [] }, ...prev]);
+    setDraft({ mood: "🙂", text: "", tag: "마음", photo: "" });
+    addActivity("우리들의 오늘에 기록을 남겼어요.");
+    addXp("우리들의 오늘 작성", 10);
+  };
+  const reactToday = (id, key) => {
+    setTodayPosts((prev) => prev.map((post) => (post.id === id ? { ...post, [key]: post[key] + 1 } : post)));
+    if (!todayReacted) {
+      setTodayReacted(true);
+      addXp("우리들의 오늘 반응", 1);
+    }
+  };
+  const addComment = (id) => {
+    const text = (commentDrafts[id] || "").trim();
+    if (!text) return;
+    setTodayPosts((prev) => prev.map((post) => (post.id === id ? { ...post, comments: [...(post.comments || []), text] } : post)));
+    setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
+  };
+  return (
+    <DetailPage title="우리들의 오늘" onBack={goBack}>
+      <p className="text-sm font-semibold leading-6 text-sub">비교와 과시보다, 평범한 하루와 공감을 나눠요.</p>
+      <OurTodaySection draft={draft} setDraft={setDraft} posts={todayPosts} onSubmit={addTodayPost} onReact={reactToday} commentDrafts={commentDrafts} setCommentDrafts={setCommentDrafts} onComment={addComment} />
+    </DetailPage>
+  );
+}
+
 function SimilarProfileScreen({ detail, goBack, addActivity, addXp, supportedPeople, setSupportedPeople }) {
   const person = similarPeople.find((item) => item.id === detail.personId) || similarPeople[0];
   const sent = supportedPeople.includes(person.id);
@@ -1542,8 +1584,8 @@ function Overlay(props) {
     const actions = [
       { label: "글쓰기", icon: PenLine, color: "mint", run: () => setOverlay("write") },
       { label: "모임 만들기", icon: UsersRound, color: "blue", run: () => setOverlay("createMeetup") },
-      { label: "청년지원 보기", icon: WalletCards, color: "purple", run: () => { setActiveTab("support"); close(); } },
-      { label: "심리테스트 하기", icon: BookOpenCheck, color: "coral", run: () => { setDetail({ type: "psychTest" }); close(); } },
+      { label: "연결", icon: HeartHandshake, color: "purple", run: () => { setDetail({ type: "connection" }); close(); } },
+      { label: "성장", icon: Sprout, color: "coral", run: () => { setDetail({ type: "growth" }); close(); } },
     ];
     return <OverlayShell title="빠른 실행" onClose={close}>{actions.map((action) => { const Icon = action.icon; return <button key={action.label} className="flex w-full items-center gap-3 rounded-2xl bg-slate-50 p-4 text-left" type="button" onClick={action.run}><span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${colorClass[action.color].soft} ${colorClass[action.color].text}`}><Icon size={20} /></span><span className="font-black text-ink">{action.label}</span></button>; })}</OverlayShell>;
   }
@@ -1784,8 +1826,13 @@ function SimilarPeopleSection({ onOpen }) {
   );
 }
 
-function OurTodaySection({ draft, setDraft, posts, onSubmit, onReact }) {
+function OurTodaySection({ draft, setDraft, posts, onSubmit, onReact, commentDrafts = {}, setCommentDrafts, onComment }) {
   const tags = ["취업", "자취", "공부", "인간관계", "생활", "운동", "마음"];
+  const pickPhoto = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setDraft((prev) => ({ ...prev, photo: URL.createObjectURL(file) }));
+  };
   return (
     <div className="mt-4 space-y-3">
       <section className="rounded-[24px] bg-white p-4 shadow-card">
@@ -1795,6 +1842,11 @@ function OurTodaySection({ draft, setDraft, posts, onSubmit, onReact }) {
           {["🙂", "😐", "😔", "😫"].map((mood) => <button key={mood} className={`h-11 w-11 rounded-2xl text-xl ${draft.mood === mood ? "bg-mint text-white" : "bg-slate-50"}`} type="button" onClick={() => setDraft((prev) => ({ ...prev, mood }))}>{mood}</button>)}
         </div>
         <textarea className="modal-input mt-3 min-h-24 resize-none" value={draft.text} onChange={(event) => setDraft((prev) => ({ ...prev, text: event.target.value }))} placeholder="오늘의 한 줄을 남겨요" />
+        <label className="mt-3 flex cursor-pointer items-center justify-center rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-sub">
+          사진 1장 선택
+          <input className="hidden" type="file" accept="image/*" onChange={pickPhoto} />
+        </label>
+        {draft.photo && <img className="mt-3 h-36 w-full rounded-2xl object-cover" src={draft.photo} alt="오늘 기록 사진 미리보기" />}
         <div className="mt-3 flex flex-wrap gap-2">
           {tags.map((tag) => <button key={tag} className={`rounded-full px-3 py-1.5 text-xs font-black ${draft.tag === tag ? "bg-mint text-white" : "bg-slate-50 text-sub"}`} type="button" onClick={() => setDraft((prev) => ({ ...prev, tag }))}>{tag}</button>)}
         </div>
@@ -1806,12 +1858,22 @@ function OurTodaySection({ draft, setDraft, posts, onSubmit, onReact }) {
             <span className="text-3xl">{post.mood}</span>
             <Tag color="purple">{post.tag}</Tag>
           </div>
+          {post.photo && <img className="mt-3 h-44 w-full rounded-2xl object-cover" src={post.photo} alt="우리들의 오늘 사진" />}
           <p className="mt-3 whitespace-pre-line text-base font-bold leading-7 text-ink">{post.text}</p>
           <div className="mt-4 grid grid-cols-3 gap-2">
             <button className="rounded-2xl bg-mint/10 px-2 py-2 text-xs font-black text-mint" type="button" onClick={() => onReact(post.id, "empathy")}>공감해요 {post.empathy}</button>
             <button className="rounded-2xl bg-blue/10 px-2 py-2 text-xs font-black text-blue" type="button" onClick={() => onReact(post.id, "same")}>나도 그래요 {post.same}</button>
             <button className="rounded-2xl bg-coral/10 px-2 py-2 text-xs font-black text-coral" type="button" onClick={() => onReact(post.id, "cheer")}>응원해요 {post.cheer}</button>
           </div>
+          {onComment && (
+            <div className="mt-4 space-y-2">
+              {(post.comments || []).map((comment, index) => <p key={`${post.id}-${index}`} className="rounded-2xl bg-slate-50 px-3 py-2 text-sm font-semibold text-sub">{comment}</p>)}
+              <div className="flex gap-2">
+                <input className="modal-input min-w-0 flex-1 py-3" value={commentDrafts[post.id] || ""} onChange={(event) => setCommentDrafts((prev) => ({ ...prev, [post.id]: event.target.value }))} placeholder="댓글을 남겨요" />
+                <button className="rounded-2xl bg-mint px-3 text-xs font-black text-white" type="button" onClick={() => onComment(post.id)}>작성</button>
+              </div>
+            </div>
+          )}
         </article>
       ))}
     </div>
