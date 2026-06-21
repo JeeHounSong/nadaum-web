@@ -90,13 +90,14 @@ const meetupItems = [
   { id: "career", title: "취업 포트폴리오 리뷰", type: "온라인", place: "줌 링크", date: "6.27 토 16:00", count: 5, max: 8, intro: "서로 포트폴리오를 보고 개선 포인트를 나눠요.", tags: ["스터디", "자격증", "취업"], icon: BookOpenCheck, color: "blue" },
   { id: "coffee", title: "낯가림 적은 커피챗", type: "오프라인", place: "홍대입구", date: "6.29 월 14:00", count: 3, max: 6, intro: "처음 만나는 사람도 부담 없도록 짧고 편하게 진행해요.", tags: ["대화", "친목", "동네"], icon: Coffee, color: "coral" },
   { id: "game", title: "롤 같이 할 사람", type: "온라인", place: "디스코드", date: "6.30 화 21:00", count: 4, max: 5, intro: "승패보다 즐겁게 같이 게임할 분을 찾아요.", tags: ["게임", "LOL", "친목"], icon: Gamepad2, color: "purple" },
+  { id: "book", title: "독서 모임", type: "오프라인", place: "홍대", date: "이번 주말", count: 6, max: 10, intro: "읽고 있는 책을 가볍게 소개하고 서로의 문장을 나눠요.", tags: ["독서", "자유", "취향"], icon: BookOpenCheck, color: "yellow" },
 ];
 
 const supportItems = [
-  { id: 1, title: "청년 월세 한시 지원", status: "신청 가능", desc: "월 최대 20만원, 12개월 지원", category: "주거", target: "만 19-39세 무주택 청년", period: "2026.06.01 - 2026.07.15", icon: Home, color: "mint", image: A.supportHome },
-  { id: 2, title: "구직활동 응원 패키지", status: "맞춤 추천", desc: "면접 정장, 사진, 컨설팅 바우처", category: "취업", target: "구직활동 중인 청년", period: "상시 접수", icon: ClipboardCheck, color: "blue", image: A.supportJob },
-  { id: 3, title: "마음건강 상담권", status: "오늘 마감", desc: "전문 상담 1:1 연계", category: "마음", target: "심리 상담이 필요한 청년", period: "2026.06.21 마감", icon: HeartHandshake, color: "coral", image: A.supportHeart },
-  { id: 4, title: "청년 교육 클래스", status: "추천", desc: "디자인·영상·취업 역량 강화", category: "교육", target: "역량 강화를 원하는 청년", period: "2026.06.25 - 2026.08.30", icon: Sprout, color: "purple", image: A.supportEducation },
+  { id: 1, title: "청년 월세 한시 지원", status: "신청 가능", desc: "월 최대 20만원, 최대 12개월 지원", category: "주거", target: "만 19~34세 무주택 청년", period: "2026.06.01 ~ 2026.08.31", docs: "주민등록등본, 임대차계약서, 소득 확인 서류", method: "복지로 또는 주민센터 신청", note: "예산 소진 시 조기 마감될 수 있어요.", icon: Home, color: "mint", image: A.supportHome },
+  { id: 2, title: "구직활동 응원 패키지", status: "맞춤 추천", desc: "면접 정장, 프로필 사진, 컨설팅 바우처 지원", category: "취업", target: "취업 준비 중인 청년", period: "상시 모집", docs: "신분증, 구직활동 증빙", method: "온라인 신청 후 승인", note: "지역별 지원 수량이 다를 수 있어요.", icon: ClipboardCheck, color: "blue", image: A.supportJob },
+  { id: 3, title: "마음건강 상담권", status: "오늘 마감", desc: "전문 상담 1:1 연계, 상담권 제공", category: "마음", target: "심리 상담이 필요한 청년", period: "오늘 마감", docs: "간단 자가진단 결과", method: "앱 내 신청 후 상담기관 연계", note: "위기 상황이라면 즉시 전문기관에 연락하세요.", icon: HeartHandshake, color: "coral", image: A.supportHeart },
+  { id: 4, title: "청년 교육 클래스", status: "추천", desc: "디자인, 영상, 취업 역량 강화 클래스", category: "교육", target: "역량 강화를 원하는 청년", period: "매월 모집", docs: "없음", method: "앱에서 바로 신청", note: "선착순 클래스는 빠르게 마감될 수 있어요.", icon: Sprout, color: "purple", image: A.supportEducation },
 ];
 
 const badges = [
@@ -125,6 +126,89 @@ const psychQuestions = [
   "지금 나에게 필요한 건 정보보다 관계다.",
   "오늘의 상태를 기록하고 싶다.",
 ];
+
+const psychResults = [
+  {
+    title: "차분한 회복형",
+    line: "지금은 속도를 낮추고 나를 돌볼 때예요.",
+    desc: "혼자 쉬는 시간이 에너지를 회복시키는 상태입니다.",
+    actions: ["오늘 상태를 짧게 기록하기", "무리한 약속은 줄이기", "가벼운 산책으로 몸 풀기"],
+    meetups: ["한강 저녁 산책", "낯가림 적은 커피챗"],
+    support: "마음건강 상담권",
+  },
+  {
+    title: "연결 충전형",
+    line: "가벼운 대화와 관계가 힘이 되는 날이에요.",
+    desc: "혼자보다 누군가와 느슨하게 연결될 때 안정감을 느낍니다.",
+    actions: ["커뮤니티에 댓글 남기기", "짧은 커피챗 살펴보기", "관심사 태그 업데이트하기"],
+    meetups: ["낯가림 적은 커피챗", "독서 모임"],
+    support: "마음건강 상담권",
+  },
+  {
+    title: "도전 에너지형",
+    line: "작은 목표를 세우면 움직임이 살아나는 상태예요.",
+    desc: "새로운 시도와 성취 경험이 오늘의 기분을 끌어올립니다.",
+    actions: ["오늘 목표 하나 정하기", "걸음수 챌린지 참여하기", "포트폴리오 리뷰 신청하기"],
+    meetups: ["취업 포트폴리오 리뷰", "한강 저녁 산책"],
+    support: "구직활동 응원 패키지",
+  },
+  {
+    title: "정보 탐색형",
+    line: "지금은 관계보다 필요한 정보를 모으고 싶은 날이에요.",
+    desc: "생활권 안의 정책과 기회를 확인하면 불안이 줄어듭니다.",
+    actions: ["청년지원 저장하기", "내 생활권 정보 확인하기", "궁금한 점 커뮤니티에 질문하기"],
+    meetups: ["취업 포트폴리오 리뷰", "독서 모임"],
+    support: "청년 월세 한시 지원",
+  },
+  {
+    title: "관계 회복형",
+    line: "조금씩 다시 사람들과 가까워질 준비가 된 상태예요.",
+    desc: "깊은 만남보다 안전하고 편안한 연결이 잘 맞습니다.",
+    actions: ["부담 적은 모임 찜하기", "댓글로 먼저 반응하기", "안전 모임 안내 확인하기"],
+    meetups: ["낯가림 적은 커피챗", "독서 모임"],
+    support: "마음건강 상담권",
+  },
+  {
+    title: "조용한 관찰형",
+    line: "바로 참여하기보다 둘러보며 감을 잡는 날이에요.",
+    desc: "관찰과 탐색을 통해 나에게 맞는 속도를 찾고 있습니다.",
+    actions: ["나다움 지도 둘러보기", "모임 상세만 살펴보기", "관심 태그 저장하기"],
+    meetups: ["독서 모임", "한강 저녁 산책"],
+    support: "청년 교육 클래스",
+  },
+  {
+    title: "루틴 성장형",
+    line: "작은 습관을 반복하면 안정감이 커지는 상태예요.",
+    desc: "정기적인 체크인과 생활 루틴이 현재의 나를 지탱합니다.",
+    actions: ["7일 체크인 시작하기", "걸음수 기록 확인하기", "이번 주 목표 적기"],
+    meetups: ["한강 저녁 산책", "취업 포트폴리오 리뷰"],
+    support: "청년 교육 클래스",
+  },
+  {
+    title: "활동 전환형",
+    line: "가벼운 움직임으로 기분 전환이 필요한 날이에요.",
+    desc: "생각이 많을수록 몸을 움직이는 활동이 도움이 됩니다.",
+    actions: ["산책 모임 보기", "운동 태그 추가하기", "오늘 5,000보 넘기기"],
+    meetups: ["한강 저녁 산책", "롤 같이 할 사람"],
+    support: "구직활동 응원 패키지",
+  },
+];
+
+function pickPsychResult(answers) {
+  const total = answers.reduce((sum, value) => sum + (value ?? 1), 0);
+  const relation = (answers[1] ?? 0) + (answers[3] ?? 0) + (answers[12] ?? 0) + (answers[14] ?? 0);
+  const routine = (answers[5] ?? 0) + (answers[7] ?? 0) + (answers[13] ?? 0) + (answers[15] ?? 0);
+  const info = (answers[8] ?? 0) + (answers[9] ?? 0);
+  const quiet = (answers[0] ?? 0) + (answers[2] ?? 0) + (answers[6] ?? 0) + (answers[11] ?? 0);
+  if (relation >= 11) return psychResults[1];
+  if (routine >= 11) return psychResults[6];
+  if (info >= 5) return psychResults[3];
+  if (quiet >= 10 && relation <= 7) return psychResults[5];
+  if (quiet >= 9) return psychResults[0];
+  if (total >= 42) return psychResults[2];
+  if (total >= 34) return psychResults[7];
+  return psychResults[4];
+}
 
 function App() {
   const [stage, setStage] = useState("login");
@@ -280,6 +364,9 @@ function MobileShell(props) {
     walkDetail: WalkDetailScreen,
     meetingDetail: MeetingDetailScreen,
     communityDetail: CommunityDetailScreen,
+    supportDetail: SupportDetailScreen,
+    myMeetups: MyMeetupsScreen,
+    savedSupports: SavedSupportsScreen,
     psychTest: PsychTestScreen,
   };
   const Screen = props.detail ? detailScreens[props.detail.type] : mainScreens[props.activeTab] || HomeScreen;
@@ -351,21 +438,34 @@ function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveT
 }
 
 function MapDetailScreen({ goBack, setActiveTab, setDetail }) {
-  const people = [
-    { name: "서연", meta: "24세 · 자취중", avatar: avatars[0] },
-    { name: "지훈", meta: "23세 · 취업준비", avatar: avatars[1] },
-    { name: "민지", meta: "25세 · 영상편집", avatar: avatars[2] },
-    { name: "도윤", meta: "24세 · 운동시작", avatar: avatars[3] },
+  const mapMeetups = [
+    { meetupId: "walk", title: "한강 저녁 산책", place: "여의나루역", type: "오프라인", date: "6.24 수 19:00", color: "mint" },
+    { meetupId: "coffee", title: "낯가림 적은 커피챗", place: "홍대입구", type: "오프라인", date: "6.29 월 14:00", color: "coral" },
+    { meetupId: "book", title: "독서 모임", place: "홍대", type: "오프라인", date: "이번 주말", color: "yellow" },
+    { meetupId: "career", title: "취업 포트폴리오 리뷰", place: "온라인", type: "온라인", date: "6.27 토 16:00", color: "blue" },
   ];
   return (
     <DetailPage title="나다움 지도" onBack={goBack}>
       <img className="h-56 w-full rounded-[28px] object-cover shadow-card" src={A.map2} alt="나다움 지도" onError={(e) => { e.currentTarget.src = A.map; }} />
-      <p className="text-sm font-semibold leading-6 text-sub">내 주변 청년들의 관심사와 생활권을 한눈에 확인해요.</p>
+      <p className="text-sm font-semibold leading-6 text-sub">내 주변에서 예정된 모임 위치를 확인해요.</p>
       <TagCloud className="mt-0" />
       <section className="rounded-[24px] bg-white p-4 shadow-card">
-        <SectionTitle title="추천 청년" />
+        <SectionTitle title="주변 모임 예정 위치" />
         <div className="mt-3 space-y-2">
-          {people.map((person) => <AvatarRow key={person.name} {...person} />)}
+          {mapMeetups.map((item) => (
+            <button
+              key={item.title}
+              className="flex w-full items-center justify-between rounded-2xl bg-slate-50 p-3 text-left"
+              type="button"
+              onClick={() => setDetail({ type: "meetingDetail", meetupId: item.meetupId })}
+            >
+              <span>
+                <span className="block text-sm font-black text-ink">{item.title}</span>
+                <span className="mt-1 block text-xs font-bold text-sub">{item.place} · {item.date}</span>
+              </span>
+              <span className={`rounded-full px-2 py-1 text-[10px] font-black ${item.type === "온라인" ? "bg-purple/10 text-purple" : "bg-mint/10 text-mint"}`}>{item.type}</span>
+            </button>
+          ))}
         </div>
       </section>
       <button className="primary-btn mint-btn" type="button" onClick={() => { setDetail(null); setActiveTab("meetups"); }}>지도에서 모임 찾기</button>
@@ -518,7 +618,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail }) {
       </section>
       <SegmentedTabs items={filters} active={filter} onChange={setFilter} />
       <div className="mt-4 space-y-2.5">
-        {visibleMeetups.length === 0 ? <EmptyCard image={A.emptyMeeting} text="참여 가능한 모임이 없어요" /> : visibleMeetups.map((meetup) => {
+        {visibleMeetups.length === 0 ? <EmptyCard image={A.emptySearch} text="조건에 맞는 모임이 없어요" /> : visibleMeetups.map((meetup) => {
           const joined = joinedMeetups.includes(meetup.id);
           const Icon = meetup.icon;
           const count = meetup.count + (joined ? 1 : 0);
@@ -548,7 +648,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail }) {
 
 function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack }) {
   const meetup = meetupItems.find((item) => item.id === detail.meetupId);
-  if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptyMeeting} text="모임을 찾을 수 없어요" /></DetailPage>;
+  if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptySearch} text="모임을 찾을 수 없어요" /></DetailPage>;
   const joined = joinedMeetups.includes(meetup.id);
   const count = meetup.count + (joined ? 1 : 0);
   const join = () => setJoinedMeetups((prev) => (prev.includes(meetup.id) ? prev : [...prev, meetup.id]));
@@ -579,7 +679,7 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack }
   );
 }
 
-function SupportScreen({ savedSupports, setSavedSupports }) {
+function SupportScreen({ savedSupports, setSavedSupports, setDetail }) {
   const [category, setCategory] = useState("주거");
   const categories = ["주거", "취업", "마음", "교육"];
   const ordered = supportItems.filter((item) => item.category === category).concat(supportItems.filter((item) => item.category !== category));
@@ -591,11 +691,11 @@ function SupportScreen({ savedSupports, setSavedSupports }) {
       <div className="mt-4 flex h-[48px] items-center gap-3 rounded-2xl bg-white px-4 text-sub shadow-card"><Search size={18} /><span className="text-sm font-bold">주거, 취업, 상담 검색</span></div>
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
       <div className="mt-4 space-y-2.5">
-        {ordered.length === 0 ? <EmptyCard image={A.emptySave} text="저장한 지원이 없어요" /> : ordered.map((item) => {
+        {ordered.map((item) => {
           const saved = savedSupports.includes(item.id);
           const Icon = item.icon;
           return (
-            <article key={item.id} className={`relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-card ${colorClass[item.color].border}`}>
+            <article key={item.id} className={`relative overflow-hidden rounded-[24px] border bg-white p-4 shadow-card ${colorClass[item.color].border}`} onClick={() => setDetail({ type: "supportDetail", supportId: item.id })}>
               <img className="absolute bottom-2 right-12 h-16 w-16 object-contain opacity-95" src={item.image} alt="" />
               <div className="relative flex items-start justify-between gap-3">
                 <div className="flex min-w-0 gap-3">
@@ -606,7 +706,7 @@ function SupportScreen({ savedSupports, setSavedSupports }) {
                     <p className="mt-1 text-sm font-semibold leading-5 text-sub">{item.desc}</p>
                   </div>
                 </div>
-                <button className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${saved ? "bg-yellow text-white" : "bg-slate-100 text-sub"}`} type="button" aria-label="저장" onClick={() => toggleSave(item.id)}>{saved ? <Check size={18} /> : <Plus size={18} />}</button>
+                <button className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${saved ? "bg-yellow text-white" : "bg-slate-100 text-sub"}`} type="button" aria-label="저장" onClick={(event) => { event.stopPropagation(); toggleSave(item.id); }}>{saved ? <Check size={18} /> : <Plus size={18} />}</button>
               </div>
             </article>
           );
@@ -616,7 +716,86 @@ function SupportScreen({ savedSupports, setSavedSupports }) {
   );
 }
 
-function MyPageScreen({ user, verified, setStage, setActiveTab, setDetail, darkMode, setDarkMode, savedSupports, joinedMeetups }) {
+function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack }) {
+  const support = supportItems.find((item) => item.id === detail.supportId);
+  if (!support) return <DetailPage title="청년지원 상세" onBack={goBack}><EmptyState image={A.emptySearch} title="지원 정보를 찾을 수 없어요" desc="다시 목록에서 선택해주세요." /></DetailPage>;
+  const saved = savedSupports.includes(support.id);
+  const toggleSave = () => setSavedSupports((prev) => (prev.includes(support.id) ? prev.filter((id) => id !== support.id) : [...prev, support.id]));
+  return (
+    <DetailPage title="청년지원 상세" onBack={goBack}>
+      <section className={`overflow-hidden rounded-[28px] border bg-white shadow-card ${colorClass[support.color].border}`}>
+        <img className="h-48 w-full object-cover" src={support.image} alt={support.title} />
+        <div className="p-4">
+          <span className={`rounded-full px-3 py-1 text-xs font-black ${colorClass[support.color].soft} ${colorClass[support.color].text}`}>{support.category}</span>
+          <h1 className="mt-3 text-2xl font-black text-ink">{support.title}</h1>
+          <p className="mt-2 text-sm font-black text-mint">{support.status}</p>
+        </div>
+      </section>
+      <section className="space-y-2 rounded-[24px] bg-white p-4 shadow-card">
+        <InfoLine label="지원 대상" value={support.target} />
+        <InfoLine label="지원 내용" value={support.desc} />
+        <InfoLine label="신청 기간" value={support.period} />
+        <InfoLine label="필요 서류" value={support.docs} />
+        <InfoLine label="신청 방법" value={support.method} />
+        <p className="rounded-2xl bg-slate-50 p-4 text-sm font-semibold leading-6 text-sub">{support.note}</p>
+      </section>
+      <button className="primary-btn mint-btn" type="button" onClick={toggleSave}>{saved ? "저장됨" : "저장하기"}</button>
+    </DetailPage>
+  );
+}
+
+function MyMeetupsScreen({ joinedMeetups, setDetail, goBack }) {
+  const joined = meetupItems.filter((item) => joinedMeetups.includes(item.id));
+  return (
+    <DetailPage title="내가 참여한 모임" onBack={goBack}>
+      {joined.length === 0 ? (
+        <EmptyState image={A.emptyMeeting} title="참여 중인 모임이 없어요" desc="관심 있는 모임을 찾아 참여해보세요." />
+      ) : (
+        <div className="space-y-2.5">
+          {joined.map((meetup) => {
+            const Icon = meetup.icon;
+            return (
+              <button key={meetup.id} className="flex w-full gap-3 rounded-[24px] bg-white p-4 text-left shadow-card" type="button" onClick={() => setDetail({ type: "meetingDetail", meetupId: meetup.id })}>
+                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${colorClass[meetup.color].soft} ${colorClass[meetup.color].text}`}><Icon size={22} /></div>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-base font-black text-ink">{meetup.title}</span>
+                  <span className="mt-1 block text-xs font-bold text-sub">{meetup.date} · {meetup.place}</span>
+                </span>
+                <ChevronRight className="mt-3 text-slate-300" size={18} />
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </DetailPage>
+  );
+}
+
+function SavedSupportsScreen({ savedSupports, setDetail, goBack }) {
+  const saved = supportItems.filter((item) => savedSupports.includes(item.id));
+  return (
+    <DetailPage title="저장한 청년지원" onBack={goBack}>
+      {saved.length === 0 ? (
+        <EmptyState image={A.emptySave} title="저장한 청년지원이 없어요" desc="필요한 지원을 저장해두면 여기서 확인할 수 있어요." />
+      ) : (
+        <div className="space-y-2.5">
+          {saved.map((item) => (
+            <button key={item.id} className="flex w-full items-center gap-3 rounded-[24px] bg-white p-4 text-left shadow-card" type="button" onClick={() => setDetail({ type: "supportDetail", supportId: item.id })}>
+              <img className="h-14 w-14 rounded-2xl object-cover" src={item.image} alt="" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-base font-black text-ink">{item.title}</span>
+                <span className="mt-1 block text-xs font-bold text-sub">{item.category} · {item.status}</span>
+              </span>
+              <ChevronRight className="text-slate-300" size={18} />
+            </button>
+          ))}
+        </div>
+      )}
+    </DetailPage>
+  );
+}
+
+function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMode }) {
   const records = [
     { label: "모임 참여", value: 12, color: "mint" },
     { label: "온라인 모임", value: 18, color: "blue" },
@@ -647,10 +826,8 @@ function MyPageScreen({ user, verified, setStage, setActiveTab, setDetail, darkM
       </section>
       <div className="mt-3 space-y-2.5">
         <MenuRow icon={BookOpenCheck} label={user.moodResult ? `심리테스트 결과: ${user.moodResult}` : "심리테스트 하기"} color="purple" image={A.mental} onClick={() => setDetail({ type: "psychTest" })} />
-        {joinedMeetups.length === 0 && <EmptyCard image={A.emptyMeeting} text="아직 참여한 모임이 없어요" />}
-        <MenuRow icon={UsersRound} label="내가 참여한 모임" color="blue" onClick={() => setActiveTab("meetups")} />
-        {savedSupports.length === 0 && <EmptyCard image={A.emptySave} text="저장한 청년지원이 없어요" />}
-        <MenuRow icon={WalletCards} label="저장한 청년지원" color="mint" onClick={() => setActiveTab("support")} />
+        <MenuRow icon={UsersRound} label="내가 참여한 모임" color="blue" onClick={() => setDetail({ type: "myMeetups" })} />
+        <MenuRow icon={WalletCards} label="저장한 청년지원" color="mint" onClick={() => setDetail({ type: "savedSupports" })} />
         <MenuRow icon={ShieldCheck} label="청년 인증 다시 보기" color="yellow" onClick={() => setStage("onboarding")} />
         <button className="flex w-full items-center justify-between rounded-[22px] bg-white p-3.5 text-left shadow-card" type="button" onClick={() => setDarkMode((value) => !value)}>
           <span className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-ink"><Moon size={20} /></span><span className="text-sm font-black text-ink">다크모드</span></span>
@@ -667,8 +844,7 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail }) {
   const [result, setResult] = useState(null);
   const options = ["매우 아니다", "아니다", "그렇다", "매우 그렇다"];
   const current = psychQuestions[step];
-  const score = answers.reduce((sum, value) => sum + (value ?? 0), 0);
-  const calculated = score >= 42 ? "연결 충전형" : score >= 32 ? "도전 에너지형" : score >= 23 ? "정보 탐색형" : "차분한 회복형";
+  const calculated = pickPsychResult(answers);
 
   if (result) {
     return (
@@ -676,19 +852,20 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail }) {
         <img className="h-52 w-full rounded-[28px] object-cover shadow-card" src={A.mental} alt="심리테스트 결과" />
         <section className="rounded-[24px] bg-white p-4 shadow-card">
           <p className="text-sm font-black text-mint">오늘의 나</p>
-          <h1 className="mt-2 text-2xl font-black text-ink">{result}</h1>
-          <p className="mt-2 text-sm font-semibold leading-6 text-sub">지금의 상태에 맞는 연결 방식과 활동을 추천해드려요.</p>
+          <h1 className="mt-2 text-2xl font-black text-ink">{result.title}</h1>
+          <p className="mt-2 text-sm font-black text-mint">{result.line}</p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-sub">{result.desc}</p>
         </section>
         <section className="rounded-[24px] bg-white p-4 shadow-card">
           <SectionTitle title="추천 행동" />
-          <div className="mt-3 space-y-2">{["오늘 상태 기록하기", "짧은 대화 모임 살펴보기", "가벼운 산책 챌린지 참여하기"].map((item) => <p key={item} className="rounded-2xl bg-mint/10 px-4 py-3 text-sm font-black text-mint">{item}</p>)}</div>
+          <div className="mt-3 space-y-2">{result.actions.map((item) => <p key={item} className="rounded-2xl bg-mint/10 px-4 py-3 text-sm font-black text-mint">{item}</p>)}</div>
         </section>
         <section className="rounded-[24px] bg-white p-4 shadow-card">
           <SectionTitle title="추천 모임" />
-          <div className="mt-3 space-y-2">{meetupItems.slice(0, 2).map((item) => <p key={item.id} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-ink">{item.title}</p>)}</div>
+          <div className="mt-3 space-y-2">{result.meetups.map((item) => <p key={item} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-ink">{item}</p>)}</div>
         </section>
-        <ActionPanel icon={WalletCards} title="마음건강 상담권" desc="전문 상담 1:1 연계" color="coral" onClick={() => setActiveTab("support")} />
-        <button className="primary-btn mint-btn" type="button" onClick={() => { setMoodResult(result); setActiveTab("home"); setDetail(null); }}>홈에 반영하기</button>
+        <ActionPanel icon={WalletCards} title={result.support} desc="추천 청년지원 확인하기" color="coral" onClick={() => setActiveTab("support")} />
+        <button className="primary-btn mint-btn" type="button" onClick={() => { setMoodResult(result.title); setActiveTab("home"); setDetail(null); }}>홈에 반영하기</button>
         <button className="secondary-btn" type="button" onClick={() => { setResult(null); setStep(0); setAnswers(Array(psychQuestions.length).fill(null)); }}>다시 테스트하기</button>
       </DetailPage>
     );
@@ -882,6 +1059,25 @@ function AvatarRow({ name, meta, avatar }) {
 
 function EmptyCard({ image, text }) {
   return <div className="rounded-[24px] bg-white p-5 text-center shadow-card"><img className="mx-auto h-24 w-24 object-contain" src={image} alt="" /><p className="mt-2 text-sm font-black text-sub">{text}</p></div>;
+}
+
+function EmptyState({ image, title, desc }) {
+  return (
+    <section className="rounded-[28px] bg-white p-6 text-center shadow-card">
+      <img className="mx-auto h-32 w-32 object-contain" src={image} alt="" />
+      <h2 className="mt-3 text-lg font-black text-ink">{title}</h2>
+      <p className="mt-2 text-sm font-semibold leading-6 text-sub">{desc}</p>
+    </section>
+  );
+}
+
+function InfoLine({ label, value }) {
+  return (
+    <div className="rounded-2xl bg-slate-50 px-4 py-3">
+      <p className="text-xs font-black text-sub">{label}</p>
+      <p className="mt-1 text-sm font-bold leading-5 text-ink">{value}</p>
+    </div>
+  );
 }
 
 function CompactMapCard({ onClick }) {
