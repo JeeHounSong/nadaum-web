@@ -89,12 +89,18 @@ const initialPosts = [
 ];
 
 const meetupItems = [
-  { id: "walk", title: "한강 저녁 산책", type: "오프라인", place: "여의나루역", date: "6.24 수 19:00", count: 9, max: 12, intro: "퇴근 후 가볍게 걷고 이야기하는 산책 모임이에요.", tags: ["운동", "동네", "건강"], icon: Dumbbell, color: "mint" },
-  { id: "career", title: "취업 포트폴리오 리뷰", type: "온라인", place: "줌 링크", date: "6.27 토 16:00", count: 5, max: 8, intro: "서로 포트폴리오를 보고 개선 포인트를 나눠요.", tags: ["스터디", "자격증", "취업"], icon: BookOpenCheck, color: "blue" },
-  { id: "coffee", title: "낯가림 적은 커피챗", type: "오프라인", place: "홍대입구", date: "6.29 월 14:00", count: 3, max: 6, intro: "처음 만나는 사람도 부담 없도록 짧고 편하게 진행해요.", tags: ["대화", "친목", "동네"], icon: Coffee, color: "coral" },
-  { id: "game", title: "롤 같이 할 사람", type: "온라인", place: "디스코드", date: "6.30 화 21:00", count: 4, max: 5, intro: "승패보다 즐겁게 같이 게임할 분을 찾아요.", tags: ["게임", "LOL", "친목"], icon: Gamepad2, color: "purple" },
-  { id: "book", title: "독서 모임", type: "오프라인", place: "홍대", date: "이번 주말", count: 6, max: 10, intro: "읽고 있는 책을 가볍게 소개하고 서로의 문장을 나눠요.", tags: ["독서", "자유", "취향"], icon: BookOpenCheck, color: "yellow" },
+  { id: "walk", title: "한강 저녁 산책", type: "오프라인", place: "여의나루역", date: "6.24 수 19:00", count: 9, max: 12, intro: "퇴근 후 가볍게 걷고 이야기하는 산책 모임이에요.", tags: ["운동", "동네", "건강"], icon: Dumbbell, color: "mint", difficulty: "beginner" },
+  { id: "career", title: "취업 포트폴리오 리뷰", type: "온라인", place: "줌 링크", date: "6.27 토 16:00", count: 5, max: 8, intro: "서로 포트폴리오를 보고 개선 포인트를 나눠요.", tags: ["스터디", "자격증", "취업"], icon: BookOpenCheck, color: "blue", difficulty: "normal" },
+  { id: "coffee", title: "낯가림 적은 커피챗", type: "오프라인", place: "홍대입구", date: "6.29 월 14:00", count: 3, max: 6, intro: "처음 만나는 사람도 부담 없도록 짧고 편하게 진행해요.", tags: ["대화", "친목", "동네"], icon: Coffee, color: "coral", difficulty: "beginner" },
+  { id: "game", title: "롤 같이 할 사람", type: "온라인", place: "디스코드", date: "6.30 화 21:00", count: 4, max: 5, intro: "승패보다 즐겁게 같이 게임할 분을 찾아요.", tags: ["게임", "LOL", "친목"], icon: Gamepad2, color: "purple", difficulty: "active" },
+  { id: "book", title: "독서 모임", type: "오프라인", place: "홍대", date: "이번 주말", count: 6, max: 10, intro: "읽고 있는 책을 가볍게 소개하고 서로의 문장을 나눠요.", tags: ["독서", "자유", "취향"], icon: BookOpenCheck, color: "yellow", difficulty: "normal" },
 ];
+
+const difficultyInfo = {
+  beginner: { label: "🌱 초보자 추천", desc: "처음 참여하는 사람에게 추천", color: "mint" },
+  normal: { label: "🌿 보통", desc: "적당한 참여 경험 필요", color: "blue" },
+  active: { label: "🌳 활발함", desc: "활발한 소통 중심", color: "purple" },
+};
 
 const supportItems = [
   { id: 1, title: "청년 월세 한시 지원", status: "신청 가능", desc: "월 최대 20만원, 최대 12개월 지원", category: "주거", target: "만 19~34세 무주택 청년", period: "2026.06.01 ~ 2026.08.31", docs: "주민등록등본, 임대차계약서, 소득 확인 서류", method: "복지로 또는 주민센터 신청", note: "예산 소진 시 조기 마감될 수 있어요.", icon: Home, color: "mint", image: A.supportHome },
@@ -307,6 +313,16 @@ function App() {
     { id: 5, date: "6/19", text: "댓글을 작성했어요." },
   ]);
   const [toast, setToast] = useState(null);
+  const [mission, setMission] = useState({ psych: false, firstPost: false, firstMeeting: false, completed: false });
+  const [attendance, setAttendance] = useState({ streak: 5, checkedToday: false, badges: ["꾸준함 배지"] });
+  const [earnedBadges, setEarnedBadges] = useState([]);
+  const [reviews, setReviews] = useState({
+    walk: [
+      { id: 1, rating: 5, text: "처음 참여했는데 부담 없이 이야기할 수 있어서 좋았어요." },
+      { id: 2, rating: 4, text: "혼자 갔지만 금방 적응할 수 있었습니다." },
+    ],
+    book: [{ id: 3, rating: 5, text: "조용하고 편하게 이야기 나누기 좋았어요." }],
+  });
   const meetups = useMemo(() => [...customMeetups, ...meetupItems], [customMeetups]);
 
   useEffect(() => {
@@ -335,6 +351,15 @@ function App() {
       return { level: nextLevel, xp: nextXp, maxXp: nextMax };
     });
   };
+
+  useEffect(() => {
+    const ready = verified && profile.tags.length > 0 && mission.psych && mission.firstPost && mission.firstMeeting;
+    if (!ready || mission.completed) return;
+    setMission((prev) => ({ ...prev, completed: true }));
+    setEarnedBadges((prev) => (prev.includes("첫걸음 배지") ? prev : [...prev, "첫걸음 배지"]));
+    addActivity("나다움 첫걸음 미션을 완료했어요.");
+    addXp("첫걸음 완료", 100);
+  }, [verified, profile.tags.length, mission.psych, mission.firstPost, mission.firstMeeting, mission.completed]);
 
   const user = useMemo(
     () => ({
@@ -393,6 +418,14 @@ function App() {
     addXp,
     toast,
     setToast,
+    mission,
+    setMission,
+    attendance,
+    setAttendance,
+    earnedBadges,
+    setEarnedBadges,
+    reviews,
+    setReviews,
     user,
   };
 
@@ -500,6 +533,7 @@ function MobileShell(props) {
     editProfile: EditProfileScreen,
     notifications: NotificationsScreen,
     activityLog: ActivityLogScreen,
+    meetingReview: MeetingReviewScreen,
     psychTest: PsychTestScreen,
   };
   const Screen = props.detail ? detailScreens[props.detail.type] : mainScreens[props.activeTab] || HomeScreen;
@@ -519,7 +553,7 @@ function MobileShell(props) {
   );
 }
 
-function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups }) {
+function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups, verified, mission, attendance, setAttendance, setEarnedBadges, addXp, addActivity }) {
   const recommendations = [
     { title: "월세 지원 신청 기간", desc: "서울시 청년 월세 지원", icon: WalletCards, color: "mint", tab: "support" },
     { title: "낯가림 적은 커피챗", desc: "6.29 월 · 홍대입구", icon: Coffee, color: "coral", tab: "meetups" },
@@ -532,6 +566,29 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
     { label: "심리상담", icon: HeartHandshake, color: "coral", run: () => setDetail({ type: "psychTest" }) },
   ];
   const joinedPreview = meetups.filter((item) => joinedMeetups.includes(item.id)).slice(0, 2);
+  const missionItems = [
+    { label: "청년 인증", done: verified },
+    { label: "관심사 설정", done: user.tags.length > 0 },
+    { label: "심리테스트 완료", done: mission.psych },
+    { label: "첫 게시글 작성", done: mission.firstPost },
+    { label: "첫 모임 참여", done: mission.firstMeeting },
+  ];
+  const missionPercent = Math.round((missionItems.filter((item) => item.done).length / missionItems.length) * 100);
+  const checkAttendance = () => {
+    if (attendance.checkedToday) return;
+    setAttendance((prev) => {
+      const nextStreak = prev.streak + 1;
+      const newBadges = [...prev.badges];
+      if (nextStreak >= 7 && !newBadges.includes("7일 출석 배지")) newBadges.push("7일 출석 배지");
+      if (nextStreak >= 14 && !newBadges.includes("14일 출석 배지")) newBadges.push("14일 출석 배지");
+      if (nextStreak >= 30 && !newBadges.includes("30일 출석 배지")) newBadges.push("30일 출석 배지");
+      if (nextStreak >= 1 && !newBadges.includes("꾸준함 배지")) newBadges.push("꾸준함 배지");
+      newBadges.forEach((badge) => setEarnedBadges((prevBadges) => (prevBadges.includes(badge) ? prevBadges : [...prevBadges, badge])));
+      return { streak: nextStreak, checkedToday: true, badges: newBadges };
+    });
+    addActivity("오늘 출석체크를 완료했어요.");
+    addXp("출석 완료", 5);
+  };
 
   return (
     <PagePadding>
@@ -551,6 +608,35 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
           </div>
         </div>
       </button>
+      <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-base font-black text-ink">오늘 출석하기</p>
+            <p className="mt-1 text-xs font-bold text-sub">현재 연속 출석: {attendance.streak}일</p>
+          </div>
+          <button className={`rounded-full px-4 py-2 text-xs font-black ${attendance.checkedToday ? "bg-slate-100 text-sub" : "bg-mint text-white"}`} type="button" onClick={checkAttendance}>
+            {attendance.checkedToday ? "오늘 출석 완료" : "출석하기"}
+          </button>
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {[1, 7, 14, 30].map((day) => (
+            <div key={day} className={`rounded-2xl px-2 py-2 text-center text-[11px] font-black ${attendance.streak >= day ? "bg-mint/10 text-mint" : "bg-slate-50 text-sub"}`}>{day}일</div>
+          ))}
+        </div>
+      </section>
+      <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-base font-black text-ink">🌱 나다움 시작하기</p>
+            <p className="mt-1 text-xs font-bold text-mint">{mission.completed ? "🎉 나다움 첫걸음 완료" : `${missionPercent}% 완료`}</p>
+          </div>
+          <Award className="text-yellow" size={24} />
+        </div>
+        <ProgressBar value={missionPercent} color="mint" compact />
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {missionItems.map((item) => <p key={item.label} className={`text-xs font-black ${item.done ? "text-mint" : "text-sub"}`}>{item.done ? "☑" : "□"} {item.label}</p>)}
+        </div>
+      </section>
       <section className="mt-3 grid grid-cols-5 gap-2 rounded-[24px] bg-white p-3 shadow-card">
         {shortcuts.map((item) => {
           const Icon = item.icon;
@@ -771,14 +857,21 @@ function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, se
   );
 }
 
-function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, darkMode, addActivity, addXp }) {
+function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, darkMode, addActivity, addXp, mission, setMission, reviews }) {
   const [filter, setFilter] = useState("전체");
   const filters = ["전체", "온라인", "오프라인", "스터디", "운동", "게임"];
   const visibleMeetups = filter === "전체" ? meetups : meetups.filter((item) => item.type === filter || item.tags.includes(filter));
   const toggleJoin = (meetup) => setJoinedMeetups((prev) => {
     const joined = prev.includes(meetup.id);
     addActivity(`${meetup.title} 모임 ${joined ? "참여를 취소했어요." : "에 참여했어요."}`);
-    if (!joined) addXp("모임 참여", 20);
+    if (!joined) {
+      if (!mission.firstMeeting) {
+        setMission((state) => ({ ...state, firstMeeting: true }));
+        addXp("첫 모임 참여", 30);
+      } else {
+        addXp("모임 참여", 20);
+      }
+    }
     return joined ? prev.filter((meetupId) => meetupId !== meetup.id) : [...prev, meetup.id];
   });
 
@@ -803,6 +896,8 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
           const joined = joinedMeetups.includes(meetup.id);
           const Icon = meetup.icon;
           const count = meetup.count + (joined ? 1 : 0);
+          const diff = difficultyInfo[meetup.difficulty || "beginner"];
+          const reviewStats = getReviewStats(reviews[meetup.id]);
           return (
             <article key={meetup.id} className="rounded-[24px] bg-white p-4 shadow-card" onClick={() => setDetail({ type: "meetingDetail", meetupId: meetup.id })}>
               <div className="flex items-start gap-3">
@@ -814,11 +909,12 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
                   </div>
                   <h2 className="mt-1.5 text-base font-black text-ink">{meetup.title}</h2>
                   <p className="mt-1 flex items-center gap-1 text-xs font-bold text-sub"><MapPin size={13} />{meetup.place}</p>
+                  <p className={`mt-1 text-[11px] font-black ${colorClass[diff.color].text}`}>{diff.label}</p>
                 </div>
                 <button className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-black ${joined ? "bg-ink text-white" : "bg-mint/10 text-mint"}`} type="button" onClick={(e) => { e.stopPropagation(); toggleJoin(meetup); }}>{joined ? "참여중" : "참여"}</button>
               </div>
               <ProgressBar value={(count / meetup.max) * 100} color={meetup.color} compact />
-              <p className="mt-2 text-xs font-black text-sub">{count}명 / {meetup.max}명</p>
+              <p className="mt-2 text-xs font-black text-sub">{count}명 / {meetup.max}명 · ⭐ {reviewStats.average} · 후기 {reviewStats.count}개</p>
             </article>
           );
         })}
@@ -827,15 +923,25 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
   );
 }
 
-function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, meetups, darkMode, addActivity, addXp }) {
+function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, meetups, darkMode, addActivity, addXp, mission, setMission, reviews, setDetail }) {
   const meetup = meetups.find((item) => item.id === detail.meetupId);
   if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptySearch} text="모임을 찾을 수 없어요" darkMode={darkMode} /></DetailPage>;
   const joined = joinedMeetups.includes(meetup.id);
   const count = meetup.count + (joined ? 1 : 0);
+  const diff = difficultyInfo[meetup.difficulty || "beginner"];
+  const meetupReviews = reviews[meetup.id] || [];
+  const reviewStats = getReviewStats(meetupReviews);
   const toggleJoin = () => setJoinedMeetups((prev) => {
     const alreadyJoined = prev.includes(meetup.id);
     addActivity(`${meetup.title} 모임 ${alreadyJoined ? "참여를 취소했어요." : "에 참여했어요."}`);
-    if (!alreadyJoined) addXp("모임 참여", 20);
+    if (!alreadyJoined) {
+      if (!mission.firstMeeting) {
+        setMission((state) => ({ ...state, firstMeeting: true }));
+        addXp("첫 모임 참여", 30);
+      } else {
+        addXp("모임 참여", 20);
+      }
+    }
     return alreadyJoined ? prev.filter((id) => id !== meetup.id) : [...prev, meetup.id];
   });
   return (
@@ -847,6 +953,10 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, 
           <h1 className="mt-3 text-2xl font-black text-ink">{meetup.title}</h1>
           <p className="mt-2 text-sm font-bold text-sub">{meetup.date}</p>
           <p className="mt-1 flex items-center gap-1 text-sm font-bold text-sub"><MapPin size={15} />{meetup.place}</p>
+          <div className={`mt-3 rounded-2xl p-3 ${colorClass[diff.color].soft}`}>
+            <p className={`text-sm font-black ${colorClass[diff.color].text}`}>{diff.label}</p>
+            <p className="mt-1 text-xs font-bold text-sub">{diff.desc}</p>
+          </div>
           <ProgressBar value={(count / meetup.max) * 100} color={meetup.color} />
           <p className="mt-2 text-sm font-black text-sub">{count}명 / {meetup.max}명</p>
         </div>
@@ -859,6 +969,18 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, 
       <section className="rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="참여자" />
         <div className="mt-3 flex -space-x-2">{avatars.slice(0, 5).map((avatar) => <img key={avatar} className="h-11 w-11 rounded-full border-2 border-white object-cover" src={avatar} alt="" />)}</div>
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="후기 보기" action={`⭐ ${reviewStats.average} · ${reviewStats.count}개`} />
+        <div className="mt-3 space-y-2">
+          {meetupReviews.length === 0 ? <p className="rounded-2xl bg-slate-50 p-3 text-sm font-bold text-sub">아직 후기가 없어요.</p> : meetupReviews.slice(0, 3).map((review) => (
+            <div key={review.id} className="rounded-2xl bg-slate-50 p-3">
+              <p className="text-sm font-black text-yellow">{"⭐".repeat(review.rating)}</p>
+              <p className="mt-2 text-sm font-semibold leading-5 text-sub">{review.text}</p>
+            </div>
+          ))}
+        </div>
+        <button className="mt-3 w-full rounded-2xl bg-mint/10 px-4 py-3 text-sm font-black text-mint" type="button" onClick={() => setDetail({ type: "meetingReview", meetupId: meetup.id })}>후기 작성</button>
       </section>
       <button className={joined ? "primary-btn" : "primary-btn mint-btn"} type="button" onClick={toggleJoin}>{joined ? "참여중" : "참여하기"}</button>
     </DetailPage>
@@ -998,7 +1120,7 @@ function SavedSupportsScreen({ savedSupports, setDetail, goBack, darkMode, setAc
   );
 }
 
-function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMode, activityLog }) {
+function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMode, activityLog, earnedBadges }) {
   const records = [
     { label: "모임 참여", value: 12, color: "mint" },
     { label: "온라인 모임", value: 18, color: "blue" },
@@ -1025,7 +1147,10 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
       </section>
       <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="성장 배지" action="14개" />
-        <div className="mt-3 grid grid-cols-5 gap-2">{badges.map((badge) => { const Icon = badge.icon; return <div key={badge.label} className="text-center"><div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${colorClass[badge.color].soft} ${colorClass[badge.color].text} ring-2 ${colorClass[badge.color].ring}`}><Icon size={20} /></div><p className="mt-1.5 text-[10px] font-black leading-3 text-slate-600">{badge.label}</p></div>; })}</div>
+        <div className="mt-3 grid grid-cols-5 gap-2">
+          {badges.map((badge) => { const Icon = badge.icon; return <div key={badge.label} className="text-center"><div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${colorClass[badge.color].soft} ${colorClass[badge.color].text} ring-2 ${colorClass[badge.color].ring}`}><Icon size={20} /></div><p className="mt-1.5 text-[10px] font-black leading-3 text-slate-600">{badge.label}</p></div>; })}
+          {earnedBadges.slice(0, 5).map((badge) => <div key={badge} className="text-center"><div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-mint/10 text-mint ring-2 ring-mint/20"><Award size={20} /></div><p className="mt-1.5 text-[10px] font-black leading-3 text-slate-600">{badge}</p></div>)}
+        </div>
       </section>
       <RecentActivityCard items={activityLog.slice(0, 5)} onMore={() => setDetail({ type: "activityLog" })} />
       <div className="mt-3 space-y-2.5">
@@ -1042,7 +1167,7 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
   );
 }
 
-function ProfileDetailScreen({ user, verified, goBack, setStage, setDetail, joinedMeetups, savedSupports, posts, moodResult, activityLog }) {
+function ProfileDetailScreen({ user, verified, goBack, setStage, setDetail, joinedMeetups, savedSupports, posts, moodResult, activityLog, earnedBadges }) {
   const commentCount = posts.reduce((sum, post) => sum + (post.comments || 0), 0);
   const stats = [
     { label: "참여 모임", value: joinedMeetups.length, color: "mint" },
@@ -1093,6 +1218,12 @@ function ProfileDetailScreen({ user, verified, goBack, setStage, setDetail, join
               </div>
             );
           })}
+          {earnedBadges.slice(0, 5).map((badge) => (
+            <div key={badge} className="text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-mint/10 text-mint ring-2 ring-mint/20"><Award size={20} /></div>
+              <p className="mt-1.5 text-[10px] font-black leading-3 text-slate-600">{badge}</p>
+            </div>
+          ))}
         </div>
       </section>
       <RecentActivityCard items={activityLog.slice(0, 5)} onMore={() => setDetail({ type: "activityLog" })} />
@@ -1190,7 +1321,39 @@ function ActivityLogScreen({ goBack, activityLog }) {
   );
 }
 
-function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail, addActivity, addXp }) {
+function MeetingReviewScreen({ detail, meetups, reviews, setReviews, setDetail, goBack, addActivity, addXp }) {
+  const meetup = meetups.find((item) => item.id === detail.meetupId);
+  const [rating, setRating] = useState(5);
+  const [text, setText] = useState("");
+  if (!meetup) return <DetailPage title="후기 작성" onBack={goBack}><p className="text-sm font-bold text-sub">모임을 찾을 수 없어요.</p></DetailPage>;
+  const submit = () => {
+    const body = text.trim() || "처음 참여했는데 부담 없이 이야기할 수 있어서 좋았어요.";
+    setReviews((prev) => ({
+      ...prev,
+      [meetup.id]: [{ id: Date.now(), rating, text: body }, ...(prev[meetup.id] || [])],
+    }));
+    addActivity(`${meetup.title} 모임 후기를 작성했어요.`);
+    addXp("모임 후기 작성", 5);
+    setDetail({ type: "meetingDetail", meetupId: meetup.id });
+  };
+  return (
+    <DetailPage title="후기 작성" onBack={goBack}>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <p className="text-sm font-black text-mint">{meetup.title}</p>
+        <h1 className="mt-2 text-xl font-black text-ink">모임은 어땠나요?</h1>
+        <div className="mt-4 flex gap-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button key={star} className={`text-3xl ${rating >= star ? "text-yellow" : "text-slate-300"}`} type="button" onClick={() => setRating(star)}>★</button>
+          ))}
+        </div>
+      </section>
+      <textarea className="modal-input min-h-40 resize-none" value={text} onChange={(event) => setText(event.target.value)} placeholder="후기를 입력해요" />
+      <button className="primary-btn mint-btn" type="button" onClick={submit}>등록하기</button>
+    </DetailPage>
+  );
+}
+
+function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail, addActivity, addXp, mission, setMission }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState(Array(psychQuestions.length).fill(null));
   const [result, setResult] = useState(null);
@@ -1217,7 +1380,7 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail, addAc
           <div className="mt-3 space-y-2">{result.meetups.map((item) => <p key={item} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-ink">{item}</p>)}</div>
         </section>
         <ActionPanel icon={WalletCards} title={result.support} desc="추천 청년지원 확인하기" color="coral" onClick={() => setActiveTab("support")} />
-        <button className="primary-btn mint-btn" type="button" onClick={() => { setMoodResult(result.title); addActivity("심리테스트를 완료했어요."); addXp("심리테스트 완료", 15); setActiveTab("home"); setDetail(null); }}>홈에 반영하기</button>
+        <button className="primary-btn mint-btn" type="button" onClick={() => { setMoodResult(result.title); addActivity("심리테스트를 완료했어요."); if (!mission.psych) { setMission((state) => ({ ...state, psych: true })); addXp("심리테스트 완료", 20); } else { addXp("심리테스트 완료", 15); } setActiveTab("home"); setDetail(null); }}>홈에 반영하기</button>
         <button className="secondary-btn" type="button" onClick={() => { setResult(null); setStep(0); setAnswers(Array(psychQuestions.length).fill(null)); }}>다시 테스트하기</button>
       </DetailPage>
     );
@@ -1249,7 +1412,7 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail, addAc
 }
 
 function Overlay(props) {
-  const { overlay, setOverlay, setDetail, setActiveTab, setPosts, setCustomMeetups, addActivity, addXp } = props;
+  const { overlay, setOverlay, setDetail, setActiveTab, setPosts, setCustomMeetups, addActivity, addXp, mission, setMission } = props;
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState("");
   const [meetupDraft, setMeetupDraft] = useState({
@@ -1280,6 +1443,7 @@ function Overlay(props) {
       setPosts((prev) => [{ id: Date.now(), category: "자유", author: "이나담", avatar: avatars[5], time: "방금 전", title, body, likes: 0, comments: 0, color: "mint", commentList: [] }, ...prev]);
       addActivity("커뮤니티에 글을 작성했어요.");
       addXp("게시글 작성", 10);
+      if (!mission.firstPost) setMission((state) => ({ ...state, firstPost: true }));
       setDraftTitle("");
       setDraftBody("");
       setActiveTab("community");
@@ -1305,6 +1469,7 @@ function Overlay(props) {
           tags: tags.length ? tags : ["새 모임"],
           icon: UsersRound,
           color: meetupDraft.type === "온라인" ? "purple" : "mint",
+          difficulty: meetupDraft.type === "온라인" ? "normal" : "beginner",
         },
         ...prev,
       ]);
@@ -1525,6 +1690,12 @@ function ActivityCard({ image, fallback, title, value, desc, color, progress, on
       </div>
     </button>
   );
+}
+
+function getReviewStats(items = []) {
+  if (!items.length) return { average: "0.0", count: 0 };
+  const average = items.reduce((sum, item) => sum + item.rating, 0) / items.length;
+  return { average: average.toFixed(1), count: items.length };
 }
 
 function resolveEmptyImage(image, darkMode) {
