@@ -104,8 +104,8 @@ button {
 }
 
 .floating-action {
-  position: fixed;
-  left: calc(50% + 132px);
+  position: absolute;
+  right: 22px;
   bottom: 112px;
   display: flex;
   height: 54px;
@@ -200,7 +200,6 @@ button {
 
 @media (max-width: 430px) {
   .floating-action {
-    left: auto;
     right: 22px;
   }
 }
