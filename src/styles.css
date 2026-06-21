@@ -157,6 +157,47 @@ button {
   background: #ffffff;
 }
 
+.theme-dark {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.theme-dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+.theme-dark .bg-slate-50,
+.theme-dark .icon-btn,
+.theme-dark .modal-input {
+  background-color: #334155 !important;
+}
+
+.theme-dark .text-ink {
+  color: #f8fafc !important;
+}
+
+.theme-dark .text-sub,
+.theme-dark .text-slate-400,
+.theme-dark .text-slate-500,
+.theme-dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+.theme-dark .border-slate-100,
+.theme-dark .border-slate-200 {
+  border-color: #334155 !important;
+}
+
+.theme-dark .shadow-card,
+.theme-dark .shadow-tab {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.theme-dark .modal-input {
+  border-color: #475569;
+  color: #f8fafc;
+}
+
 @media (max-width: 430px) {
   .floating-action {
     left: auto;
