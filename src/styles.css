@@ -10,7 +10,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #f1f5f9;
+  background: #eef3f7;
 }
 
 button {
@@ -32,6 +32,11 @@ button {
   box-shadow: 0 16px 28px rgba(23, 32, 42, 0.18);
 }
 
+.mint-btn {
+  background: #4cc9a0;
+  box-shadow: 0 16px 30px rgba(76, 201, 160, 0.28);
+}
+
 .secondary-btn {
   display: flex;
   min-height: 54px;
@@ -41,6 +46,20 @@ button {
   gap: 10px;
   border-radius: 18px;
   background: #f1f5f9;
+  color: #17202a;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.kakao-btn {
+  display: flex;
+  min-height: 54px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 18px;
+  background: #fee500;
   color: #17202a;
   font-size: 15px;
   font-weight: 900;
@@ -70,6 +89,27 @@ button {
   background: #4cc9a0;
   color: white;
   box-shadow: 0 16px 28px rgba(76, 201, 160, 0.28);
+}
+
+.app-scroll {
+  scrollbar-width: none;
+}
+
+.app-scroll::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.map-grid {
+  background-image:
+    linear-gradient(rgba(91, 141, 239, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 141, 239, 0.09) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
 @media (max-width: 430px) {
