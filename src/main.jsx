@@ -19,6 +19,7 @@ import {
   LockKeyhole,
   Map,
   MapPin,
+  Menu,
   MessageCircle,
   MessagesSquare,
   Moon,
@@ -312,6 +313,7 @@ function App() {
   const [stage, setStage] = useState("login");
   const [activeTab, setActiveTab] = useState("home");
   const [detail, setDetail] = useState(null);
+  const [screenHistory, setScreenHistory] = useState([]);
   const [overlay, setOverlay] = useState(null);
   const [verified, setVerified] = useState(false);
   const [joinedMeetups, setJoinedMeetups] = useState(["walk"]);
@@ -408,10 +410,30 @@ function App() {
     [verified, profile, levelState, joinedMeetups.length, savedSupports.length, moodResult],
   );
 
-  const navigateDetail = (next) => setDetail(next);
-  const goBack = () => setDetail(null);
+  const navigateDetail = (next) => {
+    if (!next) {
+      setDetail(null);
+      return;
+    }
+    setScreenHistory((prev) => [...prev, { activeTab, detail }]);
+    setDetail(next);
+  };
+  const goBack = () => {
+    setScreenHistory((prev) => {
+      const last = prev[prev.length - 1];
+      if (!last) {
+        setDetail(null);
+        setActiveTab("home");
+        return [];
+      }
+      setActiveTab(last.activeTab);
+      setDetail(last.detail);
+      return prev.slice(0, -1);
+    });
+  };
   const goTab = (tab) => {
     setDetail(null);
+    setScreenHistory([]);
     setActiveTab(tab);
   };
 
@@ -582,7 +604,8 @@ function MobileShell(props) {
     psychTest: PsychTestScreen,
   };
   const Screen = props.detail ? detailScreens[props.detail.type] : mainScreens[props.activeTab] || HomeScreen;
-  const showTabs = !props.detail;
+  const tabVisibleDetails = ["connection", "growth", "ourToday"];
+  const showTabs = !props.detail || tabVisibleDetails.includes(props.detail.type);
 
   return (
     <ScreenFrame darkMode={props.darkMode}>
@@ -598,7 +621,7 @@ function MobileShell(props) {
   );
 }
 
-function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups, todayPosts }) {
+function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups, todayPosts, setOverlay }) {
   const recommendations = [
     { title: "월세 지원 신청 기간", desc: "서울시 청년 월세 지원", icon: WalletCards, color: "mint", tab: "support" },
     { title: "낯가림 적은 커피챗", desc: "6.29 월 · 홍대입구", icon: Coffee, color: "coral", tab: "meetups" },
@@ -615,7 +638,7 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
 
   return (
     <PagePadding>
-      <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} onNotify={() => setDetail({ type: "notifications" })} />
+      <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} onNotify={() => setDetail({ type: "notifications" })} onMenu={() => setOverlay("menu")} />
       <button className="mt-4 w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-mint to-blue p-4 text-left text-white shadow-lift" type="button" onClick={() => setDetail({ type: "profileDetail" })}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -659,6 +682,18 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
       </div>
       <SectionHeader title="오늘의 챌린지" action="기록 보기" onClick={() => setDetail({ type: "walkDetail" })} />
       <CompactWalkCard onClick={() => setDetail({ type: "walkDetail" })} />
+      <button className="mt-3 w-full overflow-hidden rounded-[24px] bg-white text-left shadow-card" type="button" onClick={() => setDetail({ type: "mapDetail" })}>
+        <img className="h-36 w-full object-cover" src={A.map2} alt="나다움 지도" onError={(event) => { event.currentTarget.src = A.map; }} />
+        <div className="p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-base font-black text-blue">나다움 지도</p>
+              <p className="mt-1 text-sm font-bold text-sub">내 주변 모임 위치를 확인해요.</p>
+            </div>
+            <span className="text-sm font-black text-sub">지도 열기 &gt;</span>
+          </div>
+        </div>
+      </button>
       {todayPreview && (
         <section className="mt-5 rounded-[24px] bg-white p-4 shadow-card">
           <div className="flex items-center justify-between">
@@ -760,7 +795,7 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
 
   return (
     <PagePadding>
-      <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" onNotify={() => setDetail({ type: "notifications" })} />
+      <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" onNotify={() => setDetail({ type: "notifications" })} onMenu={() => setOverlay("menu")} />
       <section className="mt-4 rounded-[26px] bg-gradient-to-br from-mint/15 via-white to-purple/15 p-4 shadow-card">
         <p className="text-sm font-black text-mint">우리들의 오늘</p>
         <h2 className="mt-1 text-xl font-black leading-7 text-ink">성공한 하루보다,<br />버텨낸 하루를 나눠요.</h2>
@@ -854,7 +889,7 @@ function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, se
   );
 }
 
-function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, darkMode, addActivity, addXp, mission, setMission, reviews }) {
+function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, setOverlay, meetups, darkMode, addActivity, addXp, mission, setMission, reviews }) {
   const [filter, setFilter] = useState("전체");
   const filters = ["전체", "온라인", "오프라인", "스터디", "운동", "게임"];
   const visibleMeetups = filter === "전체" ? meetups : meetups.filter((item) => item.type === filter || item.tags.includes(filter));
@@ -874,7 +909,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
 
   return (
     <PagePadding>
-      <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" onNotify={() => setDetail({ type: "notifications" })} />
+      <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" onNotify={() => setDetail({ type: "notifications" })} onMenu={() => setOverlay("menu")} />
       <section className="mt-4 overflow-hidden rounded-[24px] bg-white shadow-card">
         <img className="w-full object-cover" src={A.safe} alt="나다움 안전 모임" />
       </section>
@@ -984,7 +1019,7 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, 
   );
 }
 
-function SupportScreen({ savedSupports, setSavedSupports, setDetail, addActivity, addXp }) {
+function SupportScreen({ savedSupports, setSavedSupports, setDetail, setOverlay, addActivity, addXp }) {
   const [category, setCategory] = useState("주거");
   const categories = ["주거", "취업", "마음", "교육"];
   const ordered = supportItems.filter((item) => item.category === category).concat(supportItems.filter((item) => item.category !== category));
@@ -1002,7 +1037,7 @@ function SupportScreen({ savedSupports, setSavedSupports, setDetail, addActivity
 
   return (
     <PagePadding>
-      <TopBar title="청년지원" subtitle="내 상황에 맞춘 정책과 혜택" onNotify={() => setDetail({ type: "notifications" })} />
+      <TopBar title="청년지원" subtitle="내 상황에 맞춘 정책과 혜택" onNotify={() => setDetail({ type: "notifications" })} onMenu={() => setOverlay("menu")} />
       <div className="mt-4 flex h-[48px] items-center gap-3 rounded-2xl bg-white px-4 text-sub shadow-card"><Search size={18} /><span className="text-sm font-bold">주거, 취업, 상담 검색</span></div>
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
       <div className="mt-4 space-y-2.5">
@@ -1117,7 +1152,7 @@ function SavedSupportsScreen({ savedSupports, setDetail, goBack, darkMode, setAc
   );
 }
 
-function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMode, activityLog, earnedBadges }) {
+function MyPageScreen({ user, verified, setStage, setDetail, setOverlay, darkMode, setDarkMode, activityLog, earnedBadges }) {
   const records = [
     { label: "모임 참여", value: 12, color: "mint" },
     { label: "온라인 모임", value: 18, color: "blue" },
@@ -1126,7 +1161,7 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
   ];
   return (
     <PagePadding>
-      <TopBar title="마이페이지" subtitle="내 활동과 인증" onNotify={() => setDetail({ type: "notifications" })} />
+      <TopBar title="마이페이지" subtitle="내 활동과 인증" onNotify={() => setDetail({ type: "notifications" })} onMenu={() => setOverlay("menu")} />
       <button className="mt-4 w-full rounded-[26px] bg-white p-4 text-left shadow-card" type="button" onClick={() => setDetail({ type: "profileDetail" })}>
         <div className="flex items-center gap-3">
           <img className="h-16 w-16 rounded-[22px] object-cover shadow-lift ring-4 ring-mint/10" src={avatars[5]} alt="프로필" />
@@ -1322,7 +1357,7 @@ function ActivityLogScreen({ goBack, activityLog }) {
   );
 }
 
-function ConnectionScreen({ goBack, setDetail, currentStatus, setCurrentStatus, encouragementIndex, setEncouragementIndex, encouragementClaimed, setEncouragementClaimed, addActivity, addXp }) {
+function ConnectionScreen({ goBack, setDetail, setOverlay, currentStatus, setCurrentStatus, encouragementIndex, setEncouragementIndex, encouragementClaimed, setEncouragementClaimed, addActivity, addXp }) {
   const mapMeetups = [
     { id: "book", title: "독서 모임", desc: "홍대 · 이번 주말" },
     { id: "walk", title: "러닝 모임", desc: "여의나루역 · 6.24 수" },
@@ -1342,14 +1377,14 @@ function ConnectionScreen({ goBack, setDetail, currentStatus, setCurrentStatus, 
     }
   };
   return (
-    <DetailPage title="연결" onBack={goBack}>
+    <DetailPage title="연결" onBack={goBack} onMenu={() => setOverlay("menu")}>
       <p className="text-sm font-semibold leading-6 text-sub">비슷한 사람과 관심사, 모임을 통해 연결을 시작해보세요.</p>
       <StatusCard currentStatus={currentStatus} onSelect={updateStatus} />
       <SimilarPeopleSection onOpen={(person) => setDetail({ type: "similarProfile", personId: person.id })} />
-      <section className="rounded-[24px] bg-white p-4 shadow-card">
+      <button className="w-full rounded-[24px] bg-white p-4 text-left shadow-card" type="button" onClick={() => setDetail({ type: "mapDetail" })}>
         <SectionTitle title="나다움 지도" action="지도 보기" />
         <img className="mt-3 h-44 w-full rounded-[22px] object-cover" src={A.map2} alt="나다움 지도" onError={(event) => { event.currentTarget.src = A.map; }} />
-      </section>
+      </button>
       <section className="rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="주변 모임" />
         <div className="mt-3 space-y-2">
@@ -1361,7 +1396,7 @@ function ConnectionScreen({ goBack, setDetail, currentStatus, setCurrentStatus, 
   );
 }
 
-function GrowthScreen({ goBack, setDetail, user, verified, mission, attendance, setAttendance, setEarnedBadges, earnedBadges, activityLog, addXp, addActivity }) {
+function GrowthScreen({ goBack, setDetail, setOverlay, user, verified, mission, attendance, setAttendance, setEarnedBadges, earnedBadges, activityLog, addXp, addActivity }) {
   const missionItems = [
     { label: "청년 인증", done: verified },
     { label: "관심사 설정", done: user.tags.length > 0 },
@@ -1386,7 +1421,7 @@ function GrowthScreen({ goBack, setDetail, user, verified, mission, attendance, 
     addXp("출석 완료", 5);
   };
   return (
-    <DetailPage title="성장" onBack={goBack}>
+    <DetailPage title="성장" onBack={goBack} onMenu={() => setOverlay("menu")}>
       <p className="text-sm font-semibold leading-6 text-sub">작은 기록들이 모여 나다움을 만듭니다.</p>
       <section className="rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="출석체크" action={`${attendance.streak}일 연속`} />
@@ -1413,7 +1448,7 @@ function GrowthScreen({ goBack, setDetail, user, verified, mission, attendance, 
   );
 }
 
-function OurTodayScreen({ goBack, todayPosts, setTodayPosts, todayReacted, setTodayReacted, addXp, addActivity }) {
+function OurTodayScreen({ goBack, setOverlay, todayPosts, setTodayPosts, todayReacted, setTodayReacted, addXp, addActivity }) {
   const [draft, setDraft] = useState({ mood: "🙂", text: "", tag: "마음", photo: "" });
   const [commentDrafts, setCommentDrafts] = useState({});
   const addTodayPost = () => {
@@ -1438,7 +1473,7 @@ function OurTodayScreen({ goBack, todayPosts, setTodayPosts, todayReacted, setTo
     setCommentDrafts((prev) => ({ ...prev, [id]: "" }));
   };
   return (
-    <DetailPage title="우리들의 오늘" onBack={goBack}>
+    <DetailPage title="우리들의 오늘" onBack={goBack} onMenu={() => setOverlay("menu")}>
       <p className="text-sm font-semibold leading-6 text-sub">비교와 과시보다, 평범한 하루와 공감을 나눠요.</p>
       <OurTodaySection draft={draft} setDraft={setDraft} posts={todayPosts} onSubmit={addTodayPost} onReact={reactToday} commentDrafts={commentDrafts} setCommentDrafts={setCommentDrafts} onComment={addComment} />
     </DetailPage>
@@ -1589,6 +1624,36 @@ function Overlay(props) {
     ];
     return <OverlayShell title="빠른 실행" onClose={close}>{actions.map((action) => { const Icon = action.icon; return <button key={action.label} className="flex w-full items-center gap-3 rounded-2xl bg-slate-50 p-4 text-left" type="button" onClick={action.run}><span className={`flex h-10 w-10 items-center justify-center rounded-2xl ${colorClass[action.color].soft} ${colorClass[action.color].text}`}><Icon size={20} /></span><span className="font-black text-ink">{action.label}</span></button>; })}</OverlayShell>;
   }
+  if (overlay === "menu") {
+    const menuItems = [
+      { label: "홈", icon: Home, color: "mint", run: () => setActiveTab("home") },
+      { label: "커뮤니티", icon: MessagesSquare, color: "blue", run: () => setActiveTab("community") },
+      { label: "모임", icon: UsersRound, color: "purple", run: () => setActiveTab("meetups") },
+      { label: "마이페이지", icon: CircleUserRound, color: "coral", run: () => setActiveTab("my") },
+      { label: "연결", icon: HeartHandshake, color: "mint", run: () => setDetail({ type: "connection" }) },
+      { label: "성장", icon: Sprout, color: "blue", run: () => setDetail({ type: "growth" }) },
+      { label: "우리들의 오늘", icon: Heart, color: "coral", run: () => setDetail({ type: "ourToday" }) },
+      { label: "청년지원", icon: WalletCards, color: "purple", run: () => setActiveTab("support") },
+      { label: "나다움 지도", icon: Map, color: "blue", run: () => setDetail({ type: "mapDetail" }) },
+      { label: "심리테스트", icon: BookOpenCheck, color: "yellow", run: () => setDetail({ type: "psychTest" }) },
+      { label: "알림", icon: Bell, color: "mint", run: () => setDetail({ type: "notifications" }) },
+    ];
+    return (
+      <OverlayShell title="전체 메뉴" onClose={close}>
+        <div className="grid grid-cols-2 gap-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button key={item.label} className="flex items-center gap-2 rounded-2xl bg-slate-50 p-3 text-left" type="button" onClick={() => { item.run(); close(); }}>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl ${colorClass[item.color].soft} ${colorClass[item.color].text}`}><Icon size={18} /></span>
+                <span className="text-sm font-black text-ink">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </OverlayShell>
+    );
+  }
   if (overlay === "write") {
     const submit = () => {
       const title = draftTitle.trim() || "새로운 나다움 이야기를 공유해요";
@@ -1691,12 +1756,13 @@ function BottomTabs({ activeTab, setActiveTab, onPlus }) {
   );
 }
 
-function DetailPage({ title, onBack, children }) {
+function DetailPage({ title, onBack, onMenu, children }) {
   return (
     <div className="px-5 pb-6 pt-5">
       <header className="mb-4 flex items-center gap-3">
         <button className="icon-btn" type="button" onClick={onBack} aria-label="뒤로가기"><ChevronLeft size={20} /></button>
-        <h1 className="text-xl font-black text-ink">{title}</h1>
+        <h1 className="min-w-0 flex-1 text-xl font-black text-ink">{title}</h1>
+        {onMenu && <button className="icon-btn" type="button" onClick={onMenu} aria-label="전체 메뉴"><Menu size={18} /></button>}
       </header>
       <div className="space-y-3">{children}</div>
     </div>
@@ -1721,7 +1787,7 @@ function TopLogo() {
   return <img className="h-11 w-32 object-contain" src={A.logo} alt="나다움" />;
 }
 
-function TopBar({ title, subtitle, onNotify }) {
+function TopBar({ title, subtitle, onNotify, onMenu }) {
   return (
     <header className="flex items-center justify-between gap-3">
       <div className="min-w-0">
@@ -1729,7 +1795,10 @@ function TopBar({ title, subtitle, onNotify }) {
         <h1 className="text-[24px] font-black text-ink">{title}</h1>
         <p className="mt-0.5 text-sm font-bold text-sub">{subtitle}</p>
       </div>
-      <button className="icon-btn" type="button" aria-label="알림" onClick={onNotify}><Bell size={18} /></button>
+      <div className="flex shrink-0 gap-2">
+        <button className="icon-btn" type="button" aria-label="알림" onClick={onNotify}><Bell size={18} /></button>
+        <button className="icon-btn" type="button" aria-label="전체 메뉴" onClick={onMenu}><Menu size={18} /></button>
+      </div>
     </header>
   );
 }
