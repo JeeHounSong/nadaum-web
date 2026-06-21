@@ -440,6 +440,7 @@ function MobileShell(props) {
     supportDetail: SupportDetailScreen,
     myMeetups: MyMeetupsScreen,
     savedSupports: SavedSupportsScreen,
+    profileDetail: ProfileDetailScreen,
     psychTest: PsychTestScreen,
   };
   const Screen = props.detail ? detailScreens[props.detail.type] : mainScreens[props.activeTab] || HomeScreen;
@@ -475,7 +476,7 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
   return (
     <PagePadding>
       <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} />
-      <section className="mt-4 overflow-hidden rounded-[28px] bg-gradient-to-br from-mint to-blue p-4 text-white shadow-lift">
+      <button className="mt-4 w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-mint to-blue p-4 text-left text-white shadow-lift" type="button" onClick={() => setDetail({ type: "profileDetail" })}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-lg font-black">오늘도 반가워요, 이나담님 🙂</p>
@@ -489,7 +490,7 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
             <Sprout size={34} />
           </div>
         </div>
-      </section>
+      </button>
       <section className="mt-3 grid grid-cols-5 gap-2 rounded-[24px] bg-white p-3 shadow-card">
         {shortcuts.map((item) => {
           const Icon = item.icon;
@@ -512,14 +513,31 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
           return <ActionPanel key={meetup.id} icon={Icon} title={meetup.title} desc={`${meetup.date} · ${meetup.place}`} color={meetup.color} onClick={() => setDetail({ type: "meetingDetail", meetupId: meetup.id })} />;
         })}
       </div>
-      <SectionHeader title="오늘의 챌린지" action="기록 보기" onClick={() => setDetail({ type: "walkDetail" })} />
-      <CompactWalkCard onClick={() => setDetail({ type: "walkDetail" })} />
       <SectionHeader title="오늘 추천" action="더보기" onClick={() => setActiveTab("support")} />
       <div className="space-y-2.5">
         {recommendations.map((item) => <ActionPanel key={item.title} {...item} onClick={() => setActiveTab(item.tab)} />)}
       </div>
-      <SectionHeader title="나다움 지도" action="열기" onClick={() => setDetail({ type: "mapDetail" })} />
-      <CompactMapCard onClick={() => setDetail({ type: "mapDetail" })} />
+      <SectionHeader title="오늘의 활동" action="전체보기" onClick={() => setDetail({ type: "walkDetail" })} />
+      <div className="grid grid-cols-2 gap-3">
+        <ActivityCard
+          image={A.walk}
+          title="걸음 챌린지"
+          value="5,300보"
+          desc="목표 10,000보"
+          color="mint"
+          progress={53}
+          onClick={() => setDetail({ type: "walkDetail" })}
+        />
+        <ActivityCard
+          image={A.map2}
+          fallback={A.map}
+          title="나다움 지도"
+          value="주변 모임 12개"
+          desc="내 생활권 모임 보기"
+          color="blue"
+          onClick={() => setDetail({ type: "mapDetail" })}
+        />
+      </div>
       <div className="mt-3 grid grid-cols-3 gap-2">
         <MiniStat label="참여 모임" value={`${joinedMeetups.length}개`} />
         <MiniStat label="심리 결과" value={moodResult || "대기"} />
@@ -901,7 +919,7 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
   return (
     <PagePadding>
       <TopBar title="마이페이지" subtitle="내 활동과 인증" />
-      <section className="mt-4 rounded-[26px] bg-white p-4 shadow-card">
+      <button className="mt-4 w-full rounded-[26px] bg-white p-4 text-left shadow-card" type="button" onClick={() => setDetail({ type: "profileDetail" })}>
         <div className="flex items-center gap-3">
           <img className="h-16 w-16 rounded-[22px] object-cover shadow-lift ring-4 ring-mint/10" src={avatars[5]} alt="프로필" />
           <div>
@@ -910,7 +928,7 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
             <p className="mt-1 text-xs font-bold text-mint">나다움을 찾아가는 중</p>
           </div>
         </div>
-      </section>
+      </button>
       <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card"><SectionTitle title="나다움 지도" /><TagCloud className="mt-3" /></section>
       <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="활동 기록" />
@@ -931,6 +949,67 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
         </button>
       </div>
     </PagePadding>
+  );
+}
+
+function ProfileDetailScreen({ user, verified, goBack, setStage, joinedMeetups, savedSupports, posts, moodResult }) {
+  const commentCount = posts.reduce((sum, post) => sum + (post.comments || 0), 0);
+  const stats = [
+    { label: "참여 모임", value: joinedMeetups.length, color: "mint" },
+    { label: "작성 글", value: posts.filter((post) => post.author === "이나담").length, color: "blue" },
+    { label: "댓글", value: commentCount, color: "purple" },
+    { label: "저장 지원", value: savedSupports.length, color: "yellow" },
+  ];
+  return (
+    <DetailPage title="내 프로필" onBack={goBack}>
+      <section className="rounded-[28px] bg-white p-5 text-center shadow-card">
+        <img className="mx-auto h-24 w-24 rounded-[30px] object-cover shadow-lift ring-4 ring-mint/10" src={avatars[5]} alt="이나담 프로필" />
+        <h1 className="mt-4 text-2xl font-black text-ink">이나담</h1>
+        <p className="mt-1 text-sm font-bold text-sub">{verified ? "청년 인증 완료" : user.badge}</p>
+        <div className="mx-auto mt-3 inline-flex rounded-full bg-mint/10 px-3 py-1 text-xs font-black text-mint">나다움 레벨 {user.level}</div>
+        <p className="mt-4 text-xs font-bold text-sub">1,240 / 2,000 XP</p>
+        <ProgressBar value={62} color="mint" />
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="나다움 지도 태그" />
+        <TagCloud className="mt-3" />
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="심리테스트 결과" />
+        <p className="mt-3 rounded-2xl bg-purple/10 px-4 py-3 text-sm font-black text-purple">{moodResult || "아직 결과가 없어요"}</p>
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="활동 기록" />
+        <div className="mt-3 grid grid-cols-2 gap-2.5">
+          {stats.map((stat) => (
+            <div key={stat.label} className={`rounded-2xl p-3 ${colorClass[stat.color].soft}`}>
+              <p className="text-xl font-black text-ink">{stat.value}</p>
+              <p className="mt-1 text-xs font-black text-sub">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="성장 배지" />
+        <div className="mt-3 grid grid-cols-5 gap-2">
+          {badges.map((badge) => {
+            const Icon = badge.icon;
+            return (
+              <div key={badge.label} className="text-center">
+                <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${colorClass[badge.color].soft} ${colorClass[badge.color].text} ring-2 ${colorClass[badge.color].ring}`}>
+                  <Icon size={20} />
+                </div>
+                <p className="mt-1.5 text-[10px] font-black leading-3 text-slate-600">{badge.label}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      <div className="grid grid-cols-2 gap-2">
+        <button className="secondary-btn" type="button">프로필 수정</button>
+        <button className="primary-btn mint-btn" type="button" onClick={() => setStage("onboarding")}>청년 인증 다시 보기</button>
+      </div>
+    </DetailPage>
   );
 }
 
@@ -1223,6 +1302,20 @@ function Tag({ children, color = "mint" }) {
 
 function AvatarRow({ name, meta, avatar }) {
   return <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3"><img className="h-10 w-10 rounded-full object-cover" src={avatar} alt="" /><div><p className="text-sm font-black text-ink">{name}</p><p className="text-xs font-bold text-sub">{meta}</p></div></div>;
+}
+
+function ActivityCard({ image, fallback, title, value, desc, color, progress, onClick }) {
+  return (
+    <button className="flex min-h-[194px] flex-col rounded-[24px] bg-white p-3 text-left shadow-card" type="button" onClick={onClick}>
+      <img className="h-24 w-full rounded-[18px] bg-slate-50 object-cover" src={image} alt={title} onError={(event) => { if (fallback) event.currentTarget.src = fallback; }} />
+      <div className="mt-3 flex flex-1 flex-col">
+        <p className={`text-sm font-black ${colorClass[color].text}`}>{title}</p>
+        <h2 className="mt-1 text-lg font-black leading-tight text-ink">{value}</h2>
+        <p className="mt-1 text-xs font-bold text-sub">{desc}</p>
+        {typeof progress === "number" && <ProgressBar value={progress} color={color} compact />}
+      </div>
+    </button>
+  );
 }
 
 function resolveEmptyImage(image, darkMode) {
