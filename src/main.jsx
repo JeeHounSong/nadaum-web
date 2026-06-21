@@ -51,6 +51,9 @@ const A = {
   emptyMeeting: "/assets/empty-meeting.png",
   emptySave: "/assets/empty-save.png",
   emptySearch: "/assets/empty-search.png",
+  emptyMeetingDark: "/assets/empty-meeting2.png",
+  emptySaveDark: "/assets/empty-save2.png",
+  emptySearchDark: "/assets/empty-search2.png",
 };
 
 const avatars = [
@@ -221,7 +224,9 @@ function App() {
   const [moodResult, setMoodResult] = useState(null);
   const [likedPosts, setLikedPosts] = useState([3]);
   const [posts, setPosts] = useState(initialPosts);
+  const [customMeetups, setCustomMeetups] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
+  const meetups = useMemo(() => [...customMeetups, ...meetupItems], [customMeetups]);
 
   const user = useMemo(
     () => ({
@@ -262,6 +267,8 @@ function App() {
     setLikedPosts,
     posts,
     setPosts,
+    meetups,
+    setCustomMeetups,
     darkMode,
     setDarkMode,
     user,
@@ -473,7 +480,7 @@ function MapDetailScreen({ goBack, setActiveTab, setDetail }) {
   );
 }
 
-function WalkDetailScreen({ goBack }) {
+function WalkDetailScreen({ goBack, setOverlay }) {
   const weekly = [
     ["월", "3,200보"], ["화", "4,800보"], ["수", "5,300보"], ["목", "0보"], ["금", "0보"],
   ];
@@ -500,12 +507,12 @@ function WalkDetailScreen({ goBack }) {
           ))}
         </div>
       </section>
-      <button className="primary-btn mint-btn" type="button">오늘 기록 확인</button>
+      <button className="primary-btn mint-btn" type="button" onClick={() => setOverlay("walkRecord")}>오늘 기록 확인</button>
     </DetailPage>
   );
 }
 
-function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverlay }) {
+function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverlay, darkMode }) {
   const [category, setCategory] = useState("전체");
   const categories = ["전체", "질문", "정보공유", "고민상담", "자유"];
   const visiblePosts = category === "전체" ? posts : posts.filter((post) => post.category === category);
@@ -516,7 +523,7 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
       <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" />
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
       <div className="mt-4 space-y-2.5">
-        {visiblePosts.length === 0 ? <EmptyCard image={A.emptySearch} text="검색 결과가 없어요" /> : visiblePosts.map((post) => {
+        {visiblePosts.length === 0 ? <EmptyCard image={A.emptySearch} text="검색 결과가 없어요" darkMode={darkMode} /> : visiblePosts.map((post) => {
           const liked = likedPosts.includes(post.id);
           return (
             <article key={post.id} className="rounded-[24px] bg-white p-4 shadow-card" onClick={() => setDetail({ type: "communityDetail", postId: post.id })}>
@@ -547,10 +554,12 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
   );
 }
 
-function CommunityDetailScreen({ detail, posts, setPosts, goBack }) {
+function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, setLikedPosts, darkMode }) {
   const post = posts.find((item) => item.id === detail.postId);
   const [comment, setComment] = useState("");
-  if (!post) return <DetailPage title="게시글" onBack={goBack}><EmptyCard image={A.emptySearch} text="게시글을 찾을 수 없어요" /></DetailPage>;
+  if (!post) return <DetailPage title="게시글" onBack={goBack}><EmptyCard image={A.emptySearch} text="게시글을 찾을 수 없어요" darkMode={darkMode} /></DetailPage>;
+  const liked = likedPosts.includes(post.id);
+  const toggleLike = () => setLikedPosts((prev) => (prev.includes(post.id) ? prev.filter((id) => id !== post.id) : [...prev, post.id]));
   const addComment = () => {
     const text = comment.trim();
     if (!text) return;
@@ -571,7 +580,10 @@ function CommunityDetailScreen({ detail, posts, setPosts, goBack }) {
         <h1 className="mt-4 text-xl font-black leading-7 text-ink">{post.title}</h1>
         <p className="mt-3 text-sm font-semibold leading-6 text-sub">{post.body}</p>
         <div className="mt-4 flex gap-4 text-sm font-black text-sub">
-          <span>좋아요 {post.likes}</span>
+          <button className={`flex items-center gap-1 font-black ${liked ? "text-coral" : "text-sub"}`} type="button" onClick={toggleLike}>
+            <Heart size={17} fill={liked ? "currentColor" : "none"} />
+            좋아요 {post.likes + (liked ? 1 : 0)}
+          </button>
           <span>댓글 {post.comments}</span>
         </div>
       </section>
@@ -594,18 +606,17 @@ function CommunityDetailScreen({ detail, posts, setPosts, goBack }) {
   );
 }
 
-function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail }) {
+function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, darkMode }) {
   const [filter, setFilter] = useState("전체");
   const filters = ["전체", "온라인", "오프라인", "스터디", "운동", "게임"];
-  const visibleMeetups = filter === "전체" ? meetupItems : meetupItems.filter((item) => item.type === filter || item.tags.includes(filter));
+  const visibleMeetups = filter === "전체" ? meetups : meetups.filter((item) => item.type === filter || item.tags.includes(filter));
   const toggleJoin = (id) => setJoinedMeetups((prev) => (prev.includes(id) ? prev.filter((meetupId) => meetupId !== id) : [...prev, id]));
 
   return (
     <PagePadding>
       <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" />
-      <section className="mt-4 overflow-hidden rounded-[24px] bg-blue/10 shadow-card">
-        <img className="h-24 w-full object-cover" src={A.safe} alt="나다움 안전 모임" />
-        <p className="px-4 pb-3 pt-2 text-sm font-black text-ink">나다움 모임은 단계별로 안전하게 연결돼요</p>
+      <section className="mt-4 overflow-hidden rounded-[24px] bg-white shadow-card">
+        <img className="h-32 w-full object-contain" src={A.safe} alt="나다움 안전 모임" />
       </section>
       <section className="mt-4 rounded-[24px] bg-white p-4 shadow-card">
         <div className="flex items-center gap-3">
@@ -618,7 +629,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail }) {
       </section>
       <SegmentedTabs items={filters} active={filter} onChange={setFilter} />
       <div className="mt-4 space-y-2.5">
-        {visibleMeetups.length === 0 ? <EmptyCard image={A.emptySearch} text="조건에 맞는 모임이 없어요" /> : visibleMeetups.map((meetup) => {
+        {visibleMeetups.length === 0 ? <EmptyCard image={A.emptySearch} text="조건에 맞는 모임이 없어요" darkMode={darkMode} /> : visibleMeetups.map((meetup) => {
           const joined = joinedMeetups.includes(meetup.id);
           const Icon = meetup.icon;
           const count = meetup.count + (joined ? 1 : 0);
@@ -646,9 +657,9 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail }) {
   );
 }
 
-function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack }) {
-  const meetup = meetupItems.find((item) => item.id === detail.meetupId);
-  if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptySearch} text="모임을 찾을 수 없어요" /></DetailPage>;
+function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, meetups, darkMode }) {
+  const meetup = meetups.find((item) => item.id === detail.meetupId);
+  if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptySearch} text="모임을 찾을 수 없어요" darkMode={darkMode} /></DetailPage>;
   const joined = joinedMeetups.includes(meetup.id);
   const count = meetup.count + (joined ? 1 : 0);
   const join = () => setJoinedMeetups((prev) => (prev.includes(meetup.id) ? prev : [...prev, meetup.id]));
@@ -716,9 +727,9 @@ function SupportScreen({ savedSupports, setSavedSupports, setDetail }) {
   );
 }
 
-function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack }) {
+function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack, darkMode }) {
   const support = supportItems.find((item) => item.id === detail.supportId);
-  if (!support) return <DetailPage title="청년지원 상세" onBack={goBack}><EmptyState image={A.emptySearch} title="지원 정보를 찾을 수 없어요" desc="다시 목록에서 선택해주세요." /></DetailPage>;
+  if (!support) return <DetailPage title="청년지원 상세" onBack={goBack}><EmptyState image={A.emptySearch} title="지원 정보를 찾을 수 없어요" desc="다시 목록에서 선택해주세요." darkMode={darkMode} /></DetailPage>;
   const saved = savedSupports.includes(support.id);
   const toggleSave = () => setSavedSupports((prev) => (prev.includes(support.id) ? prev.filter((id) => id !== support.id) : [...prev, support.id]));
   return (
@@ -744,12 +755,12 @@ function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack }
   );
 }
 
-function MyMeetupsScreen({ joinedMeetups, setDetail, goBack }) {
-  const joined = meetupItems.filter((item) => joinedMeetups.includes(item.id));
+function MyMeetupsScreen({ joinedMeetups, setDetail, goBack, meetups, darkMode }) {
+  const joined = meetups.filter((item) => joinedMeetups.includes(item.id));
   return (
     <DetailPage title="내가 참여한 모임" onBack={goBack}>
       {joined.length === 0 ? (
-        <EmptyState image={A.emptyMeeting} title="참여 중인 모임이 없어요" desc="관심 있는 모임을 찾아 참여해보세요." />
+        <EmptyState image={A.emptyMeeting} title="참여 중인 모임이 없어요" desc="관심 있는 모임을 찾아 참여해보세요." darkMode={darkMode} />
       ) : (
         <div className="space-y-2.5">
           {joined.map((meetup) => {
@@ -771,12 +782,12 @@ function MyMeetupsScreen({ joinedMeetups, setDetail, goBack }) {
   );
 }
 
-function SavedSupportsScreen({ savedSupports, setDetail, goBack }) {
+function SavedSupportsScreen({ savedSupports, setDetail, goBack, darkMode }) {
   const saved = supportItems.filter((item) => savedSupports.includes(item.id));
   return (
     <DetailPage title="저장한 청년지원" onBack={goBack}>
       {saved.length === 0 ? (
-        <EmptyState image={A.emptySave} title="저장한 청년지원이 없어요" desc="필요한 지원을 저장해두면 여기서 확인할 수 있어요." />
+        <EmptyState image={A.emptySave} title="저장한 청년지원이 없어요" desc="필요한 지원을 저장해두면 여기서 확인할 수 있어요." darkMode={darkMode} />
       ) : (
         <div className="space-y-2.5">
           {saved.map((item) => (
@@ -897,9 +908,18 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail }) {
 }
 
 function Overlay(props) {
-  const { overlay, setOverlay, setDetail, setActiveTab, setPosts } = props;
+  const { overlay, setOverlay, setDetail, setActiveTab, setPosts, setCustomMeetups } = props;
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState("");
+  const [meetupDraft, setMeetupDraft] = useState({
+    title: "",
+    type: "오프라인",
+    date: "",
+    place: "",
+    max: "8",
+    intro: "",
+    tags: "",
+  });
   if (!overlay) return null;
   const close = () => setOverlay(null);
 
@@ -925,7 +945,70 @@ function Overlay(props) {
     return <OverlayShell title="글쓰기" onClose={close}><input className="modal-input" value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} placeholder="제목을 입력해요" /><textarea className="modal-input min-h-28 resize-none" value={draftBody} onChange={(e) => setDraftBody(e.target.value)} placeholder="동네 청년들과 나누고 싶은 이야기를 적어보세요" /><button className="primary-btn mint-btn" type="button" onClick={submit}><Send size={18} />등록하기</button></OverlayShell>;
   }
   if (overlay === "createMeetup") {
-    return <OverlayShell title="모임 만들기" onClose={close}><p className="text-sm font-semibold leading-6 text-sub">프로토타입에서는 모임 만들기 흐름을 간단히 보여줘요. 실제 서비스에서는 일정, 장소, 모집 인원을 입력하게 됩니다.</p><button className="primary-btn mint-btn" type="button" onClick={() => { setActiveTab("meetups"); close(); }}>모임 화면으로 이동</button></OverlayShell>;
+    const update = (key, value) => setMeetupDraft((prev) => ({ ...prev, [key]: value }));
+    const submitMeetup = () => {
+      const title = meetupDraft.title.trim() || "새로운 동네 모임";
+      const tags = meetupDraft.tags.split(",").map((tag) => tag.trim()).filter(Boolean);
+      setCustomMeetups((prev) => [
+        {
+          id: `custom-${Date.now()}`,
+          title,
+          type: meetupDraft.type,
+          place: meetupDraft.place.trim() || (meetupDraft.type === "온라인" ? "온라인" : "장소 미정"),
+          date: meetupDraft.date.trim() || "일정 조율 중",
+          count: 0,
+          max: Number(meetupDraft.max) || 8,
+          intro: meetupDraft.intro.trim() || "나다움에서 새롭게 만든 모임이에요.",
+          tags: tags.length ? tags : ["새 모임"],
+          icon: UsersRound,
+          color: meetupDraft.type === "온라인" ? "purple" : "mint",
+        },
+        ...prev,
+      ]);
+      setMeetupDraft({ title: "", type: "오프라인", date: "", place: "", max: "8", intro: "", tags: "" });
+      setActiveTab("meetups");
+      close();
+    };
+    return (
+      <OverlayShell title="모임 만들기" onClose={close}>
+        <input className="modal-input" value={meetupDraft.title} onChange={(e) => update("title", e.target.value)} placeholder="모임 제목" />
+        <div className="grid grid-cols-2 gap-2">
+          {["오프라인", "온라인"].map((type) => (
+            <button key={type} className={`rounded-2xl px-3 py-3 text-sm font-black ${meetupDraft.type === type ? "bg-mint text-white" : "bg-slate-50 text-sub"}`} type="button" onClick={() => update("type", type)}>{type}</button>
+          ))}
+        </div>
+        <input className="modal-input" value={meetupDraft.date} onChange={(e) => update("date", e.target.value)} placeholder="날짜/시간 예: 7.3 금 19:00" />
+        <input className="modal-input" value={meetupDraft.place} onChange={(e) => update("place", e.target.value)} placeholder="장소 또는 플랫폼" />
+        <input className="modal-input" type="number" min="2" value={meetupDraft.max} onChange={(e) => update("max", e.target.value)} placeholder="최대 인원" />
+        <textarea className="modal-input min-h-24 resize-none" value={meetupDraft.intro} onChange={(e) => update("intro", e.target.value)} placeholder="소개글" />
+        <input className="modal-input" value={meetupDraft.tags} onChange={(e) => update("tags", e.target.value)} placeholder="태그 입력 예: 산책,동네,친목" />
+        <button className="primary-btn mint-btn" type="button" onClick={submitMeetup}>모임 등록하기</button>
+      </OverlayShell>
+    );
+  }
+  if (overlay === "walkRecord") {
+    return (
+      <OverlayShell title="오늘의 걸음 기록" onClose={close}>
+        <div className="grid grid-cols-3 gap-2">
+          <MiniStat label="오늘" value="5,300보" />
+          <MiniStat label="목표" value="10,000보" />
+          <MiniStat label="진행률" value="53%" />
+        </div>
+        <p className="rounded-2xl bg-mint/10 p-4 text-sm font-black text-mint">아직 목표까지 4,700보 남았어요</p>
+        <div className="grid grid-cols-5 gap-2 text-center">
+          {[["월", "3,200"], ["화", "4,800"], ["수", "5,300"], ["목", "0"], ["금", "0"]].map(([day, steps]) => (
+            <div key={day} className="rounded-2xl bg-slate-50 p-2">
+              <p className="text-xs font-black text-sub">{day}</p>
+              <p className="mt-1 text-[11px] font-black text-ink">{steps}</p>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button className="secondary-btn" type="button" onClick={close}>확인</button>
+          <button className="primary-btn mint-btn" type="button" onClick={close}>내일도 참여하기</button>
+        </div>
+      </OverlayShell>
+    );
   }
   return null;
 }
@@ -1057,15 +1140,28 @@ function AvatarRow({ name, meta, avatar }) {
   return <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3"><img className="h-10 w-10 rounded-full object-cover" src={avatar} alt="" /><div><p className="text-sm font-black text-ink">{name}</p><p className="text-xs font-bold text-sub">{meta}</p></div></div>;
 }
 
-function EmptyCard({ image, text }) {
-  return <div className="rounded-[24px] bg-white p-5 text-center shadow-card"><img className="mx-auto h-24 w-24 object-contain" src={image} alt="" /><p className="mt-2 text-sm font-black text-sub">{text}</p></div>;
+function resolveEmptyImage(image, darkMode) {
+  if (!darkMode) return image;
+  if (image === A.emptyMeeting) return A.emptyMeetingDark;
+  if (image === A.emptySave) return A.emptySaveDark;
+  if (image === A.emptySearch) return A.emptySearchDark;
+  return image;
 }
 
-function EmptyState({ image, title, desc }) {
+function EmptyCard({ image, text, darkMode = false }) {
+  return (
+    <div className="rounded-[24px] bg-white p-6 text-center shadow-card">
+      <img className="mx-auto h-44 w-52 object-contain" src={resolveEmptyImage(image, darkMode)} alt="" />
+      <p className="mt-4 text-sm font-black text-sub">{text}</p>
+    </div>
+  );
+}
+
+function EmptyState({ image, title, desc, darkMode = false }) {
   return (
     <section className="rounded-[28px] bg-white p-6 text-center shadow-card">
-      <img className="mx-auto h-32 w-32 object-contain" src={image} alt="" />
-      <h2 className="mt-3 text-lg font-black text-ink">{title}</h2>
+      <img className="mx-auto h-52 w-60 object-contain" src={resolveEmptyImage(image, darkMode)} alt="" />
+      <h2 className="mt-4 text-lg font-black text-ink">{title}</h2>
       <p className="mt-2 text-sm font-semibold leading-6 text-sub">{desc}</p>
     </section>
   );
