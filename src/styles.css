@@ -157,6 +157,28 @@ button {
   background: #ffffff;
 }
 
+.empty-image-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28px;
+  background: transparent;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.empty-image-button:hover {
+  opacity: 0.96;
+  transform: translateY(-1px);
+}
+
+.empty-image-button:active {
+  opacity: 0.9;
+  transform: scale(0.985);
+}
+
 .theme-dark {
   background: #0f172a;
   color: #f8fafc;

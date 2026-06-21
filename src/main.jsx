@@ -130,87 +130,153 @@ const psychQuestions = [
   "오늘의 상태를 기록하고 싶다.",
 ];
 
-const psychResults = [
-  {
-    title: "차분한 회복형",
-    line: "지금은 속도를 낮추고 나를 돌볼 때예요.",
-    desc: "혼자 쉬는 시간이 에너지를 회복시키는 상태입니다.",
-    actions: ["오늘 상태를 짧게 기록하기", "무리한 약속은 줄이기", "가벼운 산책으로 몸 풀기"],
+const psychResults = {
+  "E-A-P-O": {
+    title: "연결 에너지형",
+    line: "사람들과 함께 움직일 때 에너지가 커지는 타입이에요.",
+    desc: "대화와 오프라인 활동이 오늘의 활력을 빠르게 끌어올립니다.",
+    actions: ["모임 하나 바로 신청하기", "가벼운 댓글로 대화 시작하기", "오늘의 관심사 태그 업데이트하기"],
     meetups: ["한강 저녁 산책", "낯가림 적은 커피챗"],
     support: "마음건강 상담권",
   },
-  {
-    title: "연결 충전형",
-    line: "가벼운 대화와 관계가 힘이 되는 날이에요.",
-    desc: "혼자보다 누군가와 느슨하게 연결될 때 안정감을 느낍니다.",
-    actions: ["커뮤니티에 댓글 남기기", "짧은 커피챗 살펴보기", "관심사 태그 업데이트하기"],
-    meetups: ["낯가림 적은 커피챗", "독서 모임"],
+  "E-A-P-C": {
+    title: "온라인 소통형",
+    line: "온라인에서 먼저 연결하면 부담 없이 에너지가 살아나요.",
+    desc: "새로운 사람과의 접점은 필요하지만, 첫 시작은 화면 너머가 더 편합니다.",
+    actions: ["온라인 모임 둘러보기", "커뮤니티 질문에 답글 남기기", "관심사 기반 채팅 모임 저장하기"],
+    meetups: ["롤 같이 할 사람", "취업 포트폴리오 리뷰"],
     support: "마음건강 상담권",
   },
-  {
-    title: "도전 에너지형",
-    line: "작은 목표를 세우면 움직임이 살아나는 상태예요.",
-    desc: "새로운 시도와 성취 경험이 오늘의 기분을 끌어올립니다.",
-    actions: ["오늘 목표 하나 정하기", "걸음수 챌린지 참여하기", "포트폴리오 리뷰 신청하기"],
+  "E-A-S-O": {
+    title: "도전 성장형",
+    line: "필요한 정보를 모아 바로 실행할수록 힘이 나는 타입이에요.",
+    desc: "움직임과 실천이 잘 맞고, 오프라인 기회에서 성장 자극을 받습니다.",
+    actions: ["이번 주 목표 하나 정하기", "오프라인 스터디 확인하기", "지원 정책 하나 저장하기"],
     meetups: ["취업 포트폴리오 리뷰", "한강 저녁 산책"],
     support: "구직활동 응원 패키지",
   },
-  {
-    title: "정보 탐색형",
-    line: "지금은 관계보다 필요한 정보를 모으고 싶은 날이에요.",
-    desc: "생활권 안의 정책과 기회를 확인하면 불안이 줄어듭니다.",
-    actions: ["청년지원 저장하기", "내 생활권 정보 확인하기", "궁금한 점 커뮤니티에 질문하기"],
-    meetups: ["취업 포트폴리오 리뷰", "독서 모임"],
-    support: "청년 월세 한시 지원",
+  "E-A-S-C": {
+    title: "취업 준비형",
+    line: "온라인 정보와 실행 계획을 엮으면 속도가 나는 상태예요.",
+    desc: "진로 고민을 정리하고 실용적인 도움을 받는 흐름이 잘 맞습니다.",
+    actions: ["포트폴리오 리뷰 참여하기", "구직 지원 패키지 저장하기", "면접 준비 글 작성하기"],
+    meetups: ["취업 포트폴리오 리뷰", "롤 같이 할 사람"],
+    support: "구직활동 응원 패키지",
   },
-  {
-    title: "관계 회복형",
-    line: "조금씩 다시 사람들과 가까워질 준비가 된 상태예요.",
-    desc: "깊은 만남보다 안전하고 편안한 연결이 잘 맞습니다.",
-    actions: ["부담 적은 모임 찜하기", "댓글로 먼저 반응하기", "안전 모임 안내 확인하기"],
+  "E-R-P-O": {
+    title: "커피챗 친화형",
+    line: "느슨하고 짧은 만남에서 관계 에너지를 회복해요.",
+    desc: "큰 모임보다 편안한 대화 자리에서 안정감을 얻기 쉽습니다.",
+    actions: ["커피챗 모임 확인하기", "짧은 자기소개 남기기", "부담 적은 오프라인 모임 저장하기"],
     meetups: ["낯가림 적은 커피챗", "독서 모임"],
     support: "마음건강 상담권",
   },
-  {
-    title: "조용한 관찰형",
-    line: "바로 참여하기보다 둘러보며 감을 잡는 날이에요.",
-    desc: "관찰과 탐색을 통해 나에게 맞는 속도를 찾고 있습니다.",
-    actions: ["나다움 지도 둘러보기", "모임 상세만 살펴보기", "관심 태그 저장하기"],
+  "E-R-P-C": {
+    title: "관계 회복형",
+    line: "안전한 거리감 안에서 다시 연결되고 싶은 상태예요.",
+    desc: "바로 깊게 친해지기보다, 온라인 반응과 짧은 대화가 회복에 도움이 됩니다.",
+    actions: ["커뮤니티에 공감 누르기", "온라인 소모임 저장하기", "오늘 감정 한 줄 기록하기"],
+    meetups: ["낯가림 적은 커피챗", "롤 같이 할 사람"],
+    support: "마음건강 상담권",
+  },
+  "E-R-S-O": {
+    title: "생활 정보형",
+    line: "내 생활권의 실용 정보를 함께 나누면 안정되는 타입이에요.",
+    desc: "관계도 중요하지만 지금은 주거, 지역, 일정 같은 현실 정보가 큰 도움이 됩니다.",
+    actions: ["월세 지원 정보 저장하기", "동네 정보 글 읽기", "생활권 모임 위치 확인하기"],
     meetups: ["독서 모임", "한강 저녁 산책"],
+    support: "청년 월세 한시 지원",
+  },
+  "E-R-S-C": {
+    title: "느슨한 연결형",
+    line: "가볍게 이어지는 온라인 관계가 지금의 속도에 잘 맞아요.",
+    desc: "정보를 얻으면서도 사람들과 너무 빠르게 가까워지지 않는 방식이 편합니다.",
+    actions: ["관심 글 저장하기", "온라인 모임만 먼저 보기", "필요한 지원 하나 찜하기"],
+    meetups: ["취업 포트폴리오 리뷰", "롤 같이 할 사람"],
+    support: "청년 월세 한시 지원",
+  },
+  "I-A-P-O": {
+    title: "오프라인 활동형",
+    line: "혼자 회복한 뒤 몸을 움직이면 기분 전환이 빨라져요.",
+    desc: "말을 많이 하지 않아도 되는 활동형 오프라인 모임이 잘 맞습니다.",
+    actions: ["산책 모임 참여하기", "걸음수 기록 확인하기", "운동 태그 추가하기"],
+    meetups: ["한강 저녁 산책", "독서 모임"],
     support: "청년 교육 클래스",
   },
-  {
-    title: "루틴 성장형",
-    line: "작은 습관을 반복하면 안정감이 커지는 상태예요.",
-    desc: "정기적인 체크인과 생활 루틴이 현재의 나를 지탱합니다.",
-    actions: ["7일 체크인 시작하기", "걸음수 기록 확인하기", "이번 주 목표 적기"],
-    meetups: ["한강 저녁 산책", "취업 포트폴리오 리뷰"],
+  "I-A-P-C": {
+    title: "자기 발견형",
+    line: "혼자 정리한 생각을 온라인에서 천천히 나누는 타입이에요.",
+    desc: "새로운 활동에 관심은 있지만, 나만의 속도를 지키는 연결이 필요합니다.",
+    actions: ["오늘 상태 기록하기", "온라인 관심사 모임 살펴보기", "심리테스트 결과 저장하기"],
+    meetups: ["롤 같이 할 사람", "취업 포트폴리오 리뷰"],
     support: "청년 교육 클래스",
   },
-  {
-    title: "활동 전환형",
-    line: "가벼운 움직임으로 기분 전환이 필요한 날이에요.",
-    desc: "생각이 많을수록 몸을 움직이는 활동이 도움이 됩니다.",
-    actions: ["산책 모임 보기", "운동 태그 추가하기", "오늘 5,000보 넘기기"],
-    meetups: ["한강 저녁 산책", "롤 같이 할 사람"],
+  "I-A-S-O": {
+    title: "산책 전환형",
+    line: "정보를 정리한 뒤 가벼운 움직임으로 전환하면 좋아요.",
+    desc: "생각이 많아질수록 짧은 산책이나 야외 활동이 마음을 풀어줍니다.",
+    actions: ["걸음수 챌린지 열기", "주변 모임 위치 보기", "이번 주 지원 일정 확인하기"],
+    meetups: ["한강 저녁 산책", "독서 모임"],
+    support: "청년 월세 한시 지원",
+  },
+  "I-A-S-C": {
+    title: "스터디 몰입형",
+    line: "온라인 정보와 목표형 활동에 몰입하기 좋은 상태예요.",
+    desc: "혼자 준비하는 시간이 편하지만, 필요한 피드백은 구조화된 자리에서 얻고 싶어합니다.",
+    actions: ["스터디 모임 저장하기", "구직 지원 확인하기", "오늘 할 일 1개 정리하기"],
+    meetups: ["취업 포트폴리오 리뷰", "롤 같이 할 사람"],
     support: "구직활동 응원 패키지",
   },
-];
+  "I-R-P-O": {
+    title: "감정 정리형",
+    line: "조용한 환경에서 감정을 정리하면 다음 연결이 쉬워져요.",
+    desc: "사람이 싫은 건 아니지만, 지금은 낮은 자극의 만남이 필요합니다.",
+    actions: ["감정 기록 남기기", "조용한 독서 모임 보기", "상담 지원 확인하기"],
+    meetups: ["독서 모임", "낯가림 적은 커피챗"],
+    support: "마음건강 상담권",
+  },
+  "I-R-P-C": {
+    title: "루틴 안정형",
+    line: "작은 루틴을 반복하며 천천히 연결되는 타입이에요.",
+    desc: "무리한 변화보다 체크인, 기록, 온라인 소통처럼 예측 가능한 흐름이 안정감을 줍니다.",
+    actions: ["7일 체크인 시작하기", "온라인 모임 저장하기", "내 상태 태그 정리하기"],
+    meetups: ["롤 같이 할 사람", "낯가림 적은 커피챗"],
+    support: "청년 교육 클래스",
+  },
+  "I-R-S-O": {
+    title: "정보 탐색형",
+    line: "내 생활에 필요한 정보를 먼저 확인하고 싶은 상태예요.",
+    desc: "관계보다 정책, 주거, 지역 정보가 먼저 정리될 때 마음이 편안해집니다.",
+    actions: ["청년지원 둘러보기", "생활권 정보 확인하기", "궁금한 점 저장하기"],
+    meetups: ["독서 모임", "한강 저녁 산책"],
+    support: "청년 월세 한시 지원",
+  },
+  "I-R-S-C": {
+    title: "조용한 회복형",
+    line: "지금은 속도를 낮추고 나를 먼저 돌볼 때예요.",
+    desc: "혼자 쉬는 시간이 에너지를 회복시키고, 온라인 탐색이 부담을 줄여줍니다.",
+    actions: ["오늘 상태 한 줄 기록하기", "무리한 약속 줄이기", "필요한 지원만 조용히 저장하기"],
+    meetups: ["롤 같이 할 사람", "취업 포트폴리오 리뷰"],
+    support: "마음건강 상담권",
+  },
+};
 
 function pickPsychResult(answers) {
-  const total = answers.reduce((sum, value) => sum + (value ?? 1), 0);
-  const relation = (answers[1] ?? 0) + (answers[3] ?? 0) + (answers[12] ?? 0) + (answers[14] ?? 0);
-  const routine = (answers[5] ?? 0) + (answers[7] ?? 0) + (answers[13] ?? 0) + (answers[15] ?? 0);
-  const info = (answers[8] ?? 0) + (answers[9] ?? 0);
-  const quiet = (answers[0] ?? 0) + (answers[2] ?? 0) + (answers[6] ?? 0) + (answers[11] ?? 0);
-  if (relation >= 11) return psychResults[1];
-  if (routine >= 11) return psychResults[6];
-  if (info >= 5) return psychResults[3];
-  if (quiet >= 10 && relation <= 7) return psychResults[5];
-  if (quiet >= 9) return psychResults[0];
-  if (total >= 42) return psychResults[2];
-  if (total >= 34) return psychResults[7];
-  return psychResults[4];
+  const score = (index) => answers[index] ?? 1;
+  const reverse = (index) => 3 - score(index);
+  const axes = {
+    connection: reverse(0) + score(1) + reverse(11) + score(12),
+    activity: reverse(4) + score(5) + score(7) + score(13),
+    people: score(3) + reverse(8) + reverse(9) + score(14),
+    offline: reverse(2) + reverse(6) + score(7) + score(10),
+  };
+  const code = [
+    axes.connection >= 6 ? "E" : "I",
+    axes.activity >= 6 ? "A" : "R",
+    axes.people >= 6 ? "P" : "S",
+    axes.offline >= 6 ? "O" : "C",
+  ].join("-");
+  return { ...psychResults[code], code };
 }
 
 function App() {
@@ -392,52 +458,71 @@ function MobileShell(props) {
   );
 }
 
-function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveTab, setDetail }) {
-  const moods = [
-    { id: "calm", label: "회복형", full: "차분한 회복형", icon: Moon, color: "mint" },
-    { id: "spark", label: "도전형", full: "도전 에너지형", icon: Sparkles, color: "blue" },
-    { id: "care", label: "연결형", full: "연결 충전형", icon: Heart, color: "purple" },
-  ];
+function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, meetups }) {
   const recommendations = [
     { title: "월세 지원 신청 기간", desc: "서울시 청년 월세 지원", icon: WalletCards, color: "mint", tab: "support" },
     { title: "낯가림 적은 커피챗", desc: "6.29 월 · 홍대입구", icon: Coffee, color: "coral", tab: "meetups" },
   ];
+  const shortcuts = [
+    { label: "모임", icon: UsersRound, color: "mint", run: () => setActiveTab("meetups") },
+    { label: "커뮤니티", icon: MessagesSquare, color: "blue", run: () => setActiveTab("community") },
+    { label: "청년지원", icon: WalletCards, color: "purple", run: () => setActiveTab("support") },
+    { label: "이벤트", icon: Trophy, color: "yellow", run: () => setDetail({ type: "walkDetail" }) },
+    { label: "심리상담", icon: HeartHandshake, color: "coral", run: () => setDetail({ type: "psychTest" }) },
+  ];
+  const joinedPreview = meetups.filter((item) => joinedMeetups.includes(item.id)).slice(0, 2);
 
   return (
     <PagePadding>
       <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} />
-      <section className="mt-4 rounded-[26px] bg-white p-4 shadow-card">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-black text-mint">오늘의 체크인</p>
-            <h2 className="mt-1 text-[21px] font-black leading-tight text-ink">{moodResult || "지금 기분은 어때요?"}</h2>
+      <section className="mt-4 overflow-hidden rounded-[28px] bg-gradient-to-br from-mint to-blue p-4 text-white shadow-lift">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-lg font-black">오늘도 반가워요, 이나담님 🙂</p>
+            <p className="mt-2 text-sm font-black text-white/90">나다움 레벨 23</p>
+            <p className="mt-1 text-xs font-bold text-white/80">1,240 / 2,000 XP</p>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/30">
+              <div className="h-full w-[62%] rounded-full bg-white" />
+            </div>
           </div>
-          <Sparkles className="text-mint" size={27} />
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {moods.map((mood) => {
-            const Icon = mood.icon;
-            const active = moodResult === mood.full;
-            return (
-              <button key={mood.id} className={`h-[68px] rounded-2xl border text-center transition ${active ? `${colorClass[mood.color].bg} border-transparent text-white shadow-lift` : "border-slate-100 bg-slate-50 text-sub"}`} type="button" onClick={() => setMoodResult(mood.full)}>
-                <Icon className="mx-auto mb-1" size={20} />
-                <span className="block text-xs font-black">{mood.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-white/25 text-white">
+            <Sprout size={34} />
+          </div>
         </div>
       </section>
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <CompactMapCard onClick={() => setDetail({ type: "mapDetail" })} />
-        <CompactWalkCard onClick={() => setDetail({ type: "walkDetail" })} />
+      <section className="mt-3 grid grid-cols-5 gap-2 rounded-[24px] bg-white p-3 shadow-card">
+        {shortcuts.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button key={item.label} className="flex min-w-0 flex-col items-center gap-1.5" type="button" onClick={item.run}>
+              <span className={`flex h-11 w-11 items-center justify-center rounded-full ${colorClass[item.color].soft} ${colorClass[item.color].text}`}>
+                <Icon size={20} />
+              </span>
+              <span className="w-full truncate text-center text-[10px] font-black text-sub">{item.label}</span>
+            </button>
+          );
+        })}
+      </section>
+      <SectionHeader title="내가 참여 중인 모임" action="더보기" onClick={() => setDetail({ type: "myMeetups" })} />
+      <div className="space-y-2.5">
+        {joinedPreview.length === 0 ? (
+          <ActionPanel icon={UsersRound} title="참여 중인 모임이 없어요" desc="관심 있는 모임을 찾아보세요" color="mint" onClick={() => setActiveTab("meetups")} />
+        ) : joinedPreview.map((meetup) => {
+          const Icon = meetup.icon;
+          return <ActionPanel key={meetup.id} icon={Icon} title={meetup.title} desc={`${meetup.date} · ${meetup.place}`} color={meetup.color} onClick={() => setDetail({ type: "meetingDetail", meetupId: meetup.id })} />;
+        })}
       </div>
+      <SectionHeader title="오늘의 챌린지" action="기록 보기" onClick={() => setDetail({ type: "walkDetail" })} />
+      <CompactWalkCard onClick={() => setDetail({ type: "walkDetail" })} />
       <SectionHeader title="오늘 추천" action="더보기" onClick={() => setActiveTab("support")} />
       <div className="space-y-2.5">
         {recommendations.map((item) => <ActionPanel key={item.title} {...item} onClick={() => setActiveTab(item.tab)} />)}
       </div>
+      <SectionHeader title="나다움 지도" action="열기" onClick={() => setDetail({ type: "mapDetail" })} />
+      <CompactMapCard onClick={() => setDetail({ type: "mapDetail" })} />
       <div className="mt-3 grid grid-cols-3 gap-2">
         <MiniStat label="참여 모임" value={`${joinedMeetups.length}개`} />
-        <MiniStat label="마음 결과" value={moodResult ? "완료" : "대기"} />
+        <MiniStat label="심리 결과" value={moodResult || "대기"} />
         <MiniStat label="레벨" value={user.level} />
       </div>
     </PagePadding>
@@ -523,7 +608,7 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
       <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" />
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
       <div className="mt-4 space-y-2.5">
-        {visiblePosts.length === 0 ? <EmptyCard image={A.emptySearch} text="검색 결과가 없어요" darkMode={darkMode} /> : visiblePosts.map((post) => {
+        {visiblePosts.length === 0 ? <EmptyCard image={A.emptySearch} text="검색 결과가 없어요" darkMode={darkMode} onClick={() => setCategory("전체")} /> : visiblePosts.map((post) => {
           const liked = likedPosts.includes(post.id);
           return (
             <article key={post.id} className="rounded-[24px] bg-white p-4 shadow-card" onClick={() => setDetail({ type: "communityDetail", postId: post.id })}>
@@ -616,7 +701,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
     <PagePadding>
       <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" />
       <section className="mt-4 overflow-hidden rounded-[24px] bg-white shadow-card">
-        <img className="h-32 w-full object-contain" src={A.safe} alt="나다움 안전 모임" />
+        <img className="w-full object-cover" src={A.safe} alt="나다움 안전 모임" />
       </section>
       <section className="mt-4 rounded-[24px] bg-white p-4 shadow-card">
         <div className="flex items-center gap-3">
@@ -629,7 +714,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
       </section>
       <SegmentedTabs items={filters} active={filter} onChange={setFilter} />
       <div className="mt-4 space-y-2.5">
-        {visibleMeetups.length === 0 ? <EmptyCard image={A.emptySearch} text="조건에 맞는 모임이 없어요" darkMode={darkMode} /> : visibleMeetups.map((meetup) => {
+        {visibleMeetups.length === 0 ? <EmptyCard image={A.emptySearch} text="조건에 맞는 모임이 없어요" darkMode={darkMode} onClick={() => setFilter("전체")} /> : visibleMeetups.map((meetup) => {
           const joined = joinedMeetups.includes(meetup.id);
           const Icon = meetup.icon;
           const count = meetup.count + (joined ? 1 : 0);
@@ -662,7 +747,7 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, 
   if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptySearch} text="모임을 찾을 수 없어요" darkMode={darkMode} /></DetailPage>;
   const joined = joinedMeetups.includes(meetup.id);
   const count = meetup.count + (joined ? 1 : 0);
-  const join = () => setJoinedMeetups((prev) => (prev.includes(meetup.id) ? prev : [...prev, meetup.id]));
+  const toggleJoin = () => setJoinedMeetups((prev) => (prev.includes(meetup.id) ? prev.filter((id) => id !== meetup.id) : [...prev, meetup.id]));
   return (
     <DetailPage title="모임 상세" onBack={goBack}>
       <section className="overflow-hidden rounded-[28px] bg-white shadow-card">
@@ -685,7 +770,7 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, 
         <SectionTitle title="참여자" />
         <div className="mt-3 flex -space-x-2">{avatars.slice(0, 5).map((avatar) => <img key={avatar} className="h-11 w-11 rounded-full border-2 border-white object-cover" src={avatar} alt="" />)}</div>
       </section>
-      <button className="primary-btn mint-btn" type="button" onClick={join}>{joined ? "참여중" : "참여하기"}</button>
+      <button className={joined ? "primary-btn" : "primary-btn mint-btn"} type="button" onClick={toggleJoin}>{joined ? "참여중" : "참여하기"}</button>
     </DetailPage>
   );
 }
@@ -755,12 +840,12 @@ function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack, 
   );
 }
 
-function MyMeetupsScreen({ joinedMeetups, setDetail, goBack, meetups, darkMode }) {
+function MyMeetupsScreen({ joinedMeetups, setDetail, goBack, meetups, darkMode, setActiveTab }) {
   const joined = meetups.filter((item) => joinedMeetups.includes(item.id));
   return (
     <DetailPage title="내가 참여한 모임" onBack={goBack}>
       {joined.length === 0 ? (
-        <EmptyState image={A.emptyMeeting} title="참여 중인 모임이 없어요" desc="관심 있는 모임을 찾아 참여해보세요." darkMode={darkMode} />
+        <EmptyState image={A.emptyMeeting} title="참여 중인 모임이 없어요" desc="관심 있는 모임을 찾아 참여해보세요." darkMode={darkMode} onClick={() => setActiveTab("meetups")} />
       ) : (
         <div className="space-y-2.5">
           {joined.map((meetup) => {
@@ -782,12 +867,12 @@ function MyMeetupsScreen({ joinedMeetups, setDetail, goBack, meetups, darkMode }
   );
 }
 
-function SavedSupportsScreen({ savedSupports, setDetail, goBack, darkMode }) {
+function SavedSupportsScreen({ savedSupports, setDetail, goBack, darkMode, setActiveTab }) {
   const saved = supportItems.filter((item) => savedSupports.includes(item.id));
   return (
     <DetailPage title="저장한 청년지원" onBack={goBack}>
       {saved.length === 0 ? (
-        <EmptyState image={A.emptySave} title="저장한 청년지원이 없어요" desc="필요한 지원을 저장해두면 여기서 확인할 수 있어요." darkMode={darkMode} />
+        <EmptyState image={A.emptySave} title="저장한 청년지원이 없어요" desc="필요한 지원을 저장해두면 여기서 확인할 수 있어요." darkMode={darkMode} onClick={() => setActiveTab("support")} />
       ) : (
         <div className="space-y-2.5">
           {saved.map((item) => (
@@ -1148,22 +1233,19 @@ function resolveEmptyImage(image, darkMode) {
   return image;
 }
 
-function EmptyCard({ image, text, darkMode = false }) {
+function EmptyCard({ image, text, darkMode = false, onClick }) {
   return (
-    <div className="rounded-[24px] bg-white p-6 text-center shadow-card">
-      <img className="mx-auto h-44 w-52 object-contain" src={resolveEmptyImage(image, darkMode)} alt="" />
-      <p className="mt-4 text-sm font-black text-sub">{text}</p>
-    </div>
+    <button className="empty-image-button" type="button" onClick={onClick} aria-label={text || "빈 상태 안내"}>
+      <img className="mx-auto h-72 w-full max-w-[340px] object-contain" src={resolveEmptyImage(image, darkMode)} alt={text || "빈 상태 안내"} />
+    </button>
   );
 }
 
-function EmptyState({ image, title, desc, darkMode = false }) {
+function EmptyState({ image, title, desc, darkMode = false, onClick }) {
   return (
-    <section className="rounded-[28px] bg-white p-6 text-center shadow-card">
-      <img className="mx-auto h-52 w-60 object-contain" src={resolveEmptyImage(image, darkMode)} alt="" />
-      <h2 className="mt-4 text-lg font-black text-ink">{title}</h2>
-      <p className="mt-2 text-sm font-semibold leading-6 text-sub">{desc}</p>
-    </section>
+    <button className="empty-image-button" type="button" onClick={onClick} aria-label={`${title} ${desc || ""}`}>
+      <img className="mx-auto h-80 w-full max-w-[340px] object-contain" src={resolveEmptyImage(image, darkMode)} alt={title} />
+    </button>
   );
 }
 
