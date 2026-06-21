@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import "./styles.css";
 
+const LOGO_SRC = "/assets/nadaum-logo.png";
 const profileTags = ["재학생", "자취중", "취업준비", "영상편집", "운동시작"];
 
 const tabs = [
@@ -42,6 +43,14 @@ const tabs = [
   { id: "support", label: "지원", icon: WalletCards },
   { id: "my", label: "마이", icon: CircleUserRound },
 ];
+
+const colorClass = {
+  mint: { text: "text-mint", bg: "bg-mint", soft: "bg-mint/10", ring: "ring-mint/20", border: "border-mint/25" },
+  blue: { text: "text-blue", bg: "bg-blue", soft: "bg-blue/10", ring: "ring-blue/20", border: "border-blue/25" },
+  purple: { text: "text-purple", bg: "bg-purple", soft: "bg-purple/10", ring: "ring-purple/20", border: "border-purple/25" },
+  coral: { text: "text-coral", bg: "bg-coral", soft: "bg-coral/10", ring: "ring-coral/20", border: "border-coral/25" },
+  yellow: { text: "text-yellow", bg: "bg-yellow", soft: "bg-yellow/15", ring: "ring-yellow/25", border: "border-yellow/30" },
+};
 
 const communityPosts = [
   {
@@ -142,42 +151,10 @@ const meetupItems = [
 ];
 
 const supportItems = [
-  {
-    id: 1,
-    title: "청년 월세 한시 지원",
-    status: "신청 가능",
-    desc: "월 최대 20만원, 12개월 지원",
-    category: "주거",
-    icon: Home,
-    color: "mint",
-  },
-  {
-    id: 2,
-    title: "구직활동 응원 패키지",
-    status: "맞춤 추천",
-    desc: "면접 정장, 사진, 컨설팅 바우처",
-    category: "취업",
-    icon: ClipboardCheck,
-    color: "blue",
-  },
-  {
-    id: 3,
-    title: "마음건강 상담권",
-    status: "오늘 마감",
-    desc: "전문 상담 1:1 연계",
-    category: "마음",
-    icon: HeartHandshake,
-    color: "coral",
-  },
-  {
-    id: 4,
-    title: "청년 교육 클래스",
-    status: "추천",
-    desc: "디자인·영상·취업 역량 강화",
-    category: "교육",
-    icon: Sprout,
-    color: "purple",
-  },
+  { id: 1, title: "청년 월세 한시 지원", status: "신청 가능", desc: "월 최대 20만원, 12개월 지원", category: "주거", icon: Home, color: "mint" },
+  { id: 2, title: "구직활동 응원 패키지", status: "맞춤 추천", desc: "면접 정장, 사진, 컨설팅 바우처", category: "취업", icon: ClipboardCheck, color: "blue" },
+  { id: 3, title: "마음건강 상담권", status: "오늘 마감", desc: "전문 상담 1:1 연계", category: "마음", icon: HeartHandshake, color: "coral" },
+  { id: 4, title: "청년 교육 클래스", status: "추천", desc: "디자인·영상·취업 역량 강화", category: "교육", icon: Sprout, color: "purple" },
 ];
 
 const badges = [
@@ -187,49 +164,6 @@ const badges = [
   { label: "청년패스", icon: ShieldCheck, color: "purple" },
   { label: "7일 체크인", icon: Trophy, color: "coral" },
 ];
-
-const colorClass = {
-  mint: {
-    text: "text-mint",
-    bg: "bg-mint",
-    soft: "bg-mint/10",
-    softer: "bg-mint/15",
-    ring: "ring-mint/20",
-    border: "border-mint/25",
-  },
-  blue: {
-    text: "text-blue",
-    bg: "bg-blue",
-    soft: "bg-blue/10",
-    softer: "bg-blue/15",
-    ring: "ring-blue/20",
-    border: "border-blue/25",
-  },
-  purple: {
-    text: "text-purple",
-    bg: "bg-purple",
-    soft: "bg-purple/10",
-    softer: "bg-purple/15",
-    ring: "ring-purple/20",
-    border: "border-purple/25",
-  },
-  coral: {
-    text: "text-coral",
-    bg: "bg-coral",
-    soft: "bg-coral/10",
-    softer: "bg-coral/15",
-    ring: "ring-coral/20",
-    border: "border-coral/25",
-  },
-  yellow: {
-    text: "text-yellow",
-    bg: "bg-yellow",
-    soft: "bg-yellow/15",
-    softer: "bg-yellow/20",
-    ring: "ring-yellow/25",
-    border: "border-yellow/30",
-  },
-};
 
 function App() {
   const [stage, setStage] = useState("login");
@@ -249,10 +183,10 @@ function App() {
       savedCount: savedSupports.length,
       moodResult,
     }),
-    [joinedMeetups.length, moodResult, savedSupports.length, verified],
+    [verified, joinedMeetups.length, savedSupports.length, moodResult],
   );
 
-  const appState = {
+  const state = {
     activeTab,
     setActiveTab,
     setStage,
@@ -269,10 +203,7 @@ function App() {
     user,
   };
 
-  if (stage === "login") {
-    return <LoginScreen onLogin={() => setStage("onboarding")} />;
-  }
-
+  if (stage === "login") return <LoginScreen onLogin={() => setStage("onboarding")} />;
   if (stage === "onboarding") {
     return (
       <OnboardingScreen
@@ -285,36 +216,35 @@ function App() {
       />
     );
   }
-
-  return <MobileShell {...appState} />;
+  return <MobileShell {...state} />;
 }
 
 function LoginScreen({ onLogin }) {
   return (
     <ScreenFrame>
       <div className="flex min-h-[100dvh] flex-col justify-between px-6 py-7 sm:min-h-[860px]">
-        <BrandMark />
+        <img className="h-16 w-44 object-contain" src={LOGO_SRC} alt="나다움" />
 
         <section className="space-y-8">
-          <div className="relative mx-auto h-[310px] overflow-hidden rounded-[34px] border border-white bg-gradient-to-b from-white to-mint/8 shadow-soft">
-            <div className="absolute left-8 top-8 h-24 w-24 rounded-full bg-mint/15" />
-            <div className="absolute right-8 top-20 h-20 w-20 rounded-full bg-purple/15" />
-            <div className="absolute bottom-10 left-10 h-24 w-24 rounded-full bg-blue/15" />
-            <div className="absolute bottom-12 right-10 h-20 w-20 rounded-full bg-yellow/25" />
-            <div className="absolute left-1/2 top-10 flex h-28 w-28 -translate-x-1/2 items-center justify-center rounded-[32px] bg-white shadow-lift">
-              <BrandIcon size="large" />
+          <div className="relative mx-auto h-[320px] overflow-hidden rounded-[36px] border border-white bg-gradient-to-b from-white via-[#FAFAF7] to-mint/10 shadow-soft">
+            <PastelBlob className="left-6 top-8 h-24 w-24 bg-mint/20" />
+            <PastelBlob className="right-8 top-20 h-20 w-20 bg-purple/20" />
+            <PastelBlob className="bottom-10 left-8 h-24 w-24 bg-blue/20" />
+            <PastelBlob className="bottom-14 right-9 h-20 w-20 bg-yellow/30" />
+            <div className="absolute left-1/2 top-9 flex h-32 w-32 -translate-x-1/2 items-center justify-center rounded-[34px] bg-white p-5 shadow-lift">
+              <img className="h-full w-full object-contain" src={LOGO_SRC} alt="나다움 로고" />
             </div>
-            <div className="absolute bottom-20 left-1/2 flex -translate-x-1/2 items-end gap-5">
-              <AvatarBubble color="mint" label="커뮤니티" />
-              <div className="flex h-28 w-16 flex-col items-center justify-center rounded-full bg-white shadow-soft">
+            <div className="absolute bottom-24 left-0 right-0 flex items-end justify-center gap-5">
+              <AvatarBubble icon={MessageCircle} color="mint" />
+              <div className="flex h-28 w-16 flex-col items-center justify-center rounded-full bg-white shadow-card">
                 <Sparkles className="text-purple" size={26} />
                 <span className="mt-2 h-10 w-2 rounded-full bg-purple/30" />
               </div>
-              <AvatarBubble color="blue" label="모임" />
+              <AvatarBubble icon={HeartHandshake} color="blue" />
             </div>
-            <div className="absolute bottom-6 left-6 right-6 rounded-3xl bg-white/85 px-5 py-4 text-center shadow-lift backdrop-blur">
+            <div className="absolute bottom-6 left-6 right-6 rounded-3xl bg-white/90 px-5 py-4 text-center shadow-lift backdrop-blur">
               <p className="text-sm font-black text-ink">나답게, 함께 성장하는</p>
-              <p className="mt-1 text-xs font-bold text-slate-500">청년 생활 커뮤니티 플랫폼</p>
+              <p className="mt-1 text-xs font-bold text-sub">청년 생활 커뮤니티 플랫폼</p>
             </div>
           </div>
 
@@ -325,13 +255,13 @@ function LoginScreen({ onLogin }) {
               <br />
               하루를 시작해요
             </h1>
-            <p className="mt-4 text-[15px] font-semibold leading-7 text-slate-500">
+            <p className="mt-4 text-[15px] font-semibold leading-7 text-sub">
               생활 정보, 모임, 지원 정책, 마음 체크를 한 곳에서 이어가요.
             </p>
           </div>
 
           <div className="space-y-3">
-            <button className="primary-btn" type="button" onClick={onLogin}>
+            <button className="primary-btn mint-btn" type="button" onClick={onLogin}>
               <LockKeyhole size={19} />
               휴대폰 번호로 시작
             </button>
@@ -352,31 +282,15 @@ function LoginScreen({ onLogin }) {
 
 function OnboardingScreen({ verified, onVerify, onStart }) {
   const rows = [
-    {
-      icon: ShieldCheck,
-      title: "만 19-39세",
-      desc: "청년 지원 기준에 맞는지 확인",
-      color: "mint",
-    },
-    {
-      icon: MapPin,
-      title: "생활권 선택",
-      desc: "서울, 경기, 인천 관심 지역 설정",
-      color: "blue",
-    },
-    {
-      icon: HeartHandshake,
-      title: "관심사 선택",
-      desc: "주거, 취업, 마음건강, 모임",
-      color: "purple",
-    },
+    { icon: ShieldCheck, title: "만 19-39세", desc: "청년 지원 기준에 맞는지 확인", color: "mint" },
+    { icon: MapPin, title: "생활권 선택", desc: "서울, 경기, 인천 관심 지역 설정", color: "blue" },
+    { icon: HeartHandshake, title: "관심사 선택", desc: "주거, 취업, 마음건강, 모임", color: "purple" },
   ];
 
   return (
     <ScreenFrame>
       <div className="flex min-h-[100dvh] flex-col px-6 py-7 sm:min-h-[860px]">
-        <BrandMark />
-
+        <TopLogo />
         <div className="mt-9">
           <p className="text-sm font-black text-blue">청년 인증</p>
           <h1 className="mt-2 text-[28px] font-black leading-tight text-ink">
@@ -399,7 +313,7 @@ function OnboardingScreen({ verified, onVerify, onStart }) {
             </div>
             <div>
               <p className="font-black text-ink">나다움 청년패스</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-slate-500">
+              <p className="mt-1 text-sm font-semibold leading-6 text-sub">
                 인증하면 맞춤 지원, 모임 참여, 커뮤니티 배지가 열려요.
               </p>
             </div>
@@ -407,11 +321,7 @@ function OnboardingScreen({ verified, onVerify, onStart }) {
         </div>
 
         <div className="mt-auto space-y-3 pb-2">
-          <button
-            className={verified ? "primary-btn mint-btn" : "primary-btn"}
-            type="button"
-            onClick={verified ? onStart : onVerify}
-          >
+          <button className={verified ? "primary-btn mint-btn" : "primary-btn"} type="button" onClick={verified ? onStart : onVerify}>
             {verified ? <Check size={19} /> : <ClipboardCheck size={19} />}
             {verified ? "나다움 시작하기" : "청년 인증하기"}
           </button>
@@ -435,7 +345,7 @@ function MobileShell(props) {
 
   return (
     <ScreenFrame>
-      <div className="flex min-h-[100dvh] flex-col bg-[#F7F9FB] sm:min-h-[860px]">
+      <div className="flex min-h-[100dvh] flex-col bg-bg sm:min-h-[860px]">
         <main className="app-scroll flex-1 overflow-y-auto pb-28">
           <CurrentScreen {...props} />
         </main>
@@ -451,7 +361,6 @@ function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveT
     { id: "spark", label: "도전 에너지형", icon: Sparkles, color: "blue" },
     { id: "care", label: "연결 충전형", icon: Heart, color: "purple" },
   ];
-
   const recommendations = [
     { title: "월세 지원 신청 기간", desc: "서울시 청년 월세 지원 안내", icon: WalletCards, color: "mint", tab: "support" },
     { title: "낯가림 적은 커피챗", desc: "6.29 월 14:00 · 홍대입구역", icon: Coffee, color: "coral", tab: "meetups" },
@@ -461,7 +370,6 @@ function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveT
   return (
     <PagePadding>
       <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} />
-
       <section className="mt-5 rounded-3xl bg-white p-5 shadow-card">
         <div className="flex items-center justify-between">
           <div>
@@ -484,9 +392,7 @@ function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveT
               <button
                 key={mood.id}
                 className={`min-h-[86px] rounded-2xl border px-2 text-center transition ${
-                  active
-                    ? `${colorClass[mood.color].bg} border-transparent text-white shadow-lift`
-                    : "border-slate-100 bg-slate-50 text-slate-500"
+                  active ? `${colorClass[mood.color].bg} border-transparent text-white shadow-lift` : "border-slate-100 bg-slate-50 text-sub"
                 }`}
                 type="button"
                 onClick={() => setMoodResult(mood.label)}
@@ -504,9 +410,9 @@ function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveT
       <section className="mt-4 rounded-3xl bg-white p-5 shadow-card">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-black text-slate-400">걸음수 챌린지</p>
+            <p className="text-sm font-black text-sub">걸음수 챌린지</p>
             <h2 className="mt-1 text-[26px] font-black text-ink">오늘 5,300보</h2>
-            <p className="mt-1 text-sm font-bold text-slate-500">목표 10,000보</p>
+            <p className="mt-1 text-sm font-bold text-sub">목표 10,000보</p>
           </div>
           <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-mint/10 text-mint">
             <Dumbbell size={31} />
@@ -515,7 +421,7 @@ function HomeScreen({ user, setMoodResult, moodResult, joinedMeetups, setActiveT
         <ProgressBar value={53} color="mint" />
         <div className="mt-3 flex items-center justify-between">
           <p className="text-sm font-black text-mint">완료 시 50P 지급</p>
-          <p className="text-sm font-black text-slate-400">53%</p>
+          <p className="text-sm font-black text-sub">53%</p>
         </div>
       </section>
 
@@ -542,18 +448,14 @@ function CommunityScreen({ likedPosts, setLikedPosts }) {
   const [category, setCategory] = useState("전체");
   const categories = ["전체", "질문", "정보공유", "고민상담", "자유"];
   const posts = category === "전체" ? communityPosts : communityPosts.filter((post) => post.category === category);
-
   const toggleLike = (id) => {
-    setLikedPosts((prev) =>
-      prev.includes(id) ? prev.filter((postId) => postId !== id) : [...prev, id],
-    );
+    setLikedPosts((prev) => (prev.includes(id) ? prev.filter((postId) => postId !== id) : [...prev, id]));
   };
 
   return (
     <PagePadding>
       <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" />
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
-
       <div className="mt-5 space-y-3">
         {posts.map((post) => {
           const liked = likedPosts.includes(post.id);
@@ -566,7 +468,7 @@ function CommunityScreen({ likedPosts, setLikedPosts }) {
                   </div>
                   <div>
                     <p className="text-sm font-black text-ink">{post.author}</p>
-                    <p className="mt-0.5 text-xs font-bold text-slate-400">{post.time}</p>
+                    <p className="mt-0.5 text-xs font-bold text-sub">{post.time}</p>
                   </div>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-xs font-black ${colorClass[post.color].soft} ${colorClass[post.color].text}`}>
@@ -574,17 +476,13 @@ function CommunityScreen({ likedPosts, setLikedPosts }) {
                 </span>
               </div>
               <h2 className="mt-4 text-[17px] font-black leading-7 text-ink">{post.title}</h2>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{post.body}</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-sub">{post.body}</p>
               <div className="mt-4 flex items-center gap-4">
-                <button
-                  className={`flex items-center gap-1 text-sm font-black ${liked ? "text-coral" : "text-slate-400"}`}
-                  type="button"
-                  onClick={() => toggleLike(post.id)}
-                >
+                <button className={`flex items-center gap-1 text-sm font-black ${liked ? "text-coral" : "text-sub"}`} type="button" onClick={() => toggleLike(post.id)}>
                   <Heart size={17} fill={liked ? "currentColor" : "none"} />
                   {post.likes + (liked ? 1 : 0)}
                 </button>
-                <span className="flex items-center gap-1 text-sm font-black text-slate-400">
+                <span className="flex items-center gap-1 text-sm font-black text-sub">
                   <MessageCircle size={17} />
                   {post.comments}
                 </span>
@@ -593,7 +491,6 @@ function CommunityScreen({ likedPosts, setLikedPosts }) {
           );
         })}
       </div>
-
       <button className="floating-action" type="button" aria-label="글쓰기">
         <PenLine size={22} />
       </button>
@@ -604,35 +501,26 @@ function CommunityScreen({ likedPosts, setLikedPosts }) {
 function MeetupsScreen({ joinedMeetups, setJoinedMeetups }) {
   const [filter, setFilter] = useState("전체");
   const filters = ["전체", "온라인", "오프라인", "스터디", "운동", "게임"];
-  const visibleMeetups =
-    filter === "전체"
-      ? meetupItems
-      : meetupItems.filter((item) => item.type === filter || item.tags.includes(filter));
-
+  const visibleMeetups = filter === "전체" ? meetupItems : meetupItems.filter((item) => item.type === filter || item.tags.includes(filter));
   const toggleJoin = (id) => {
-    setJoinedMeetups((prev) =>
-      prev.includes(id) ? prev.filter((meetupId) => meetupId !== id) : [...prev, id],
-    );
+    setJoinedMeetups((prev) => (prev.includes(id) ? prev.filter((meetupId) => meetupId !== id) : [...prev, id]));
   };
 
   return (
     <PagePadding>
       <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" />
-
       <section className="mt-5 rounded-3xl bg-white p-5 shadow-card">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-blue/10 text-blue">
             <CalendarDays size={27} />
           </div>
           <div>
-            <p className="text-sm font-black text-slate-400">이번 주 참여 예정</p>
+            <p className="text-sm font-black text-sub">이번 주 참여 예정</p>
             <p className="mt-1 text-xl font-black text-ink">{joinedMeetups.length}개 모임</p>
           </div>
         </div>
       </section>
-
       <SegmentedTabs items={filters} active={filter} onChange={setFilter} />
-
       <div className="mt-5 space-y-3">
         {visibleMeetups.map((meetup) => {
           const joined = joinedMeetups.includes(meetup.id);
@@ -646,15 +534,13 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups }) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-black ${
-                      meetup.type === "온라인" ? "bg-purple/10 text-purple" : "bg-mint/10 text-mint"
-                    }`}>
+                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-black ${meetup.type === "온라인" ? "bg-purple/10 text-purple" : "bg-mint/10 text-mint"}`}>
                       {meetup.type}
                     </span>
-                    <span className="text-xs font-bold text-slate-400">{meetup.date}</span>
+                    <span className="text-xs font-bold text-sub">{meetup.date}</span>
                   </div>
                   <h2 className="mt-2 text-lg font-black text-ink">{meetup.title}</h2>
-                  <p className="mt-1 flex items-center gap-1 text-sm font-bold text-slate-500">
+                  <p className="mt-1 flex items-center gap-1 text-sm font-bold text-sub">
                     <MapPin size={15} />
                     {meetup.place}
                   </p>
@@ -662,23 +548,17 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups }) {
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {meetup.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">
+                  <span key={tag} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-sub">
                     {tag}
                   </span>
                 ))}
               </div>
               <ProgressBar value={(count / meetup.max) * 100} color={meetup.color} />
               <div className="mt-4 flex items-center justify-between">
-                <p className="text-sm font-black text-slate-400">
+                <p className="text-sm font-black text-sub">
                   {count}명 / {meetup.max}명
                 </p>
-                <button
-                  className={`h-11 rounded-2xl px-5 text-sm font-black ${
-                    joined ? "bg-ink text-white" : "bg-mint/10 text-mint"
-                  }`}
-                  type="button"
-                  onClick={() => toggleJoin(meetup.id)}
-                >
+                <button className={`h-11 rounded-full px-5 text-sm font-black ${joined ? "bg-ink text-white" : "bg-mint/10 text-mint"}`} type="button" onClick={() => toggleJoin(meetup.id)}>
                   {joined ? "참여중" : "참여하기"}
                 </button>
               </div>
@@ -693,32 +573,27 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups }) {
 function SupportScreen({ savedSupports, setSavedSupports }) {
   const [category, setCategory] = useState("주거");
   const categories = ["주거", "취업", "마음", "교육"];
-  const filtered = supportItems.filter((item) => item.category === category);
-
+  const ordered = supportItems.filter((item) => item.category === category).concat(supportItems.filter((item) => item.category !== category));
   const toggleSave = (id) => {
-    setSavedSupports((prev) =>
-      prev.includes(id) ? prev.filter((supportId) => supportId !== id) : [...prev, id],
-    );
+    setSavedSupports((prev) => (prev.includes(id) ? prev.filter((supportId) => supportId !== id) : [...prev, id]));
   };
 
   return (
     <PagePadding>
       <TopBar title="청년지원" subtitle="내 상황에 맞춘 정책과 혜택" />
-
-      <div className="mt-5 flex h-[52px] items-center gap-3 rounded-2xl bg-white px-4 py-3 text-slate-400 shadow-card">
+      <div className="mt-5 flex h-[52px] items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sub shadow-card">
         <Search size={18} />
         <span className="text-sm font-bold">주거, 취업, 상담 검색</span>
       </div>
-
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
-
       <div className="mt-5 space-y-3">
-        {filtered.concat(supportItems.filter((item) => item.category !== category)).map((item) => {
+        {ordered.map((item) => {
           const saved = savedSupports.includes(item.id);
           const Icon = item.icon;
           return (
-            <article key={item.id} className={`rounded-3xl border bg-white p-5 shadow-card ${colorClass[item.color].border}`}>
-              <div className="flex items-start justify-between gap-4">
+            <article key={item.id} className={`relative overflow-hidden rounded-3xl border bg-white p-5 shadow-card ${colorClass[item.color].border}`}>
+              <div className={`absolute -right-8 -top-8 h-24 w-24 rounded-full ${colorClass[item.color].soft}`} />
+              <div className="relative flex items-start justify-between gap-4">
                 <div className="flex gap-4">
                   <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${colorClass[item.color].soft} ${colorClass[item.color].text}`}>
                     <Icon size={25} />
@@ -728,20 +603,13 @@ function SupportScreen({ savedSupports, setSavedSupports }) {
                       <span className={`rounded-full px-2.5 py-1 text-xs font-black ${colorClass[item.color].soft} ${colorClass[item.color].text}`}>
                         {item.status}
                       </span>
-                      <span className="text-xs font-bold text-slate-400">{item.category}</span>
+                      <span className="text-xs font-bold text-sub">{item.category}</span>
                     </div>
                     <h2 className="mt-3 text-lg font-black leading-snug text-ink">{item.title}</h2>
-                    <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">{item.desc}</p>
+                    <p className="mt-2 text-sm font-semibold leading-6 text-sub">{item.desc}</p>
                   </div>
                 </div>
-                <button
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${
-                    saved ? "bg-yellow text-white" : "bg-slate-100 text-slate-400"
-                  }`}
-                  type="button"
-                  aria-label="저장"
-                  onClick={() => toggleSave(item.id)}
-                >
+                <button className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition ${saved ? "bg-yellow text-white" : "bg-slate-100 text-sub"}`} type="button" aria-label="저장" onClick={() => toggleSave(item.id)}>
                   {saved ? <Check size={19} /> : <Plus size={19} />}
                 </button>
               </div>
@@ -755,33 +623,27 @@ function SupportScreen({ savedSupports, setSavedSupports }) {
 
 function MyPageScreen({ user, verified, setStage, setActiveTab, setMoodResult }) {
   const records = [
-    { label: "모임 참여", value: 12 },
-    { label: "온라인 모임", value: 18 },
-    { label: "오프라인 모임", value: 5 },
-    { label: "댓글/게시글", value: 36 },
+    { label: "모임 참여", value: 12, color: "mint" },
+    { label: "온라인 모임", value: 18, color: "blue" },
+    { label: "오프라인 모임", value: 5, color: "yellow" },
+    { label: "댓글/게시글", value: 36, color: "purple" },
   ];
 
   return (
     <PagePadding>
       <TopBar title="마이페이지" subtitle="내 활동과 인증" />
-
       <section className="mt-5 rounded-3xl bg-white p-5 shadow-card">
         <div className="flex items-center gap-4">
-          <div className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full bg-yellow/30">
-            <CircleUserRound className="text-ink" size={46} />
-            <span className="absolute -bottom-1 -right-1 rounded-full bg-mint px-2 py-0.5 text-[10px] font-black text-white">
-              {user.level}
-            </span>
+          <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[24px] bg-white p-3 shadow-lift ring-4 ring-mint/10">
+            <img className="h-full w-full object-contain" src={LOGO_SRC} alt="나다움" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-black text-ink">이나담</h2>
-              <span className="rounded-full bg-mint/10 px-2.5 py-1 text-xs font-black text-mint">
-                {user.level}
-              </span>
+              <span className="rounded-full bg-mint/10 px-2.5 py-1 text-xs font-black text-mint">{user.level}</span>
             </div>
-            <p className="mt-1 text-sm font-bold text-slate-500">{verified ? "청년 인증 완료" : user.badge}</p>
-            <p className="mt-1 text-xs font-bold text-mint">나다움을 찾아가는 중 🌱</p>
+            <p className="mt-1 text-sm font-bold text-sub">{verified ? "청년 인증 완료" : user.badge}</p>
+            <p className="mt-1 text-xs font-bold text-mint">나다움을 찾아가는 중</p>
           </div>
         </div>
       </section>
@@ -795,9 +657,9 @@ function MyPageScreen({ user, verified, setStage, setActiveTab, setMoodResult })
         <SectionTitle title="활동 기록" />
         <div className="mt-4 grid grid-cols-2 gap-3">
           {records.map((record) => (
-            <div key={record.label} className="rounded-2xl bg-slate-50 p-4">
+            <div key={record.label} className={`rounded-2xl p-4 ${colorClass[record.color].soft}`}>
               <p className="text-2xl font-black text-ink">{record.value}</p>
-              <p className="mt-1 text-xs font-black text-slate-400">{record.label}</p>
+              <p className="mt-1 text-xs font-black text-sub">{record.label}</p>
             </div>
           ))}
         </div>
@@ -810,7 +672,7 @@ function MyPageScreen({ user, verified, setStage, setActiveTab, setMoodResult })
             const Icon = badge.icon;
             return (
               <div key={badge.label} className="w-20 shrink-0 text-center">
-                <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-3xl ${colorClass[badge.color].soft} ${colorClass[badge.color].text} ring-4 ${colorClass[badge.color].ring}`}>
+                <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${colorClass[badge.color].soft} ${colorClass[badge.color].text} ring-4 ${colorClass[badge.color].ring}`}>
                   <Icon size={25} />
                 </div>
                 <p className="mt-2 text-xs font-black text-slate-600">{badge.label}</p>
@@ -860,25 +722,14 @@ function NadaumMapCard() {
           <div className="h-5 w-5 rounded-full bg-mint shadow-lift" />
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 px-5 py-5">
-        {profileTags.map((tag, index) => (
-          <span
-            key={tag}
-            className={`rounded-full px-3 py-2 text-xs font-black ${
-              index % 2 === 0 ? "bg-mint/10 text-mint" : "bg-blue/10 text-blue"
-            }`}
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
+      <TagCloud className="px-5 py-5" />
     </section>
   );
 }
 
 function BottomTabs({ activeTab, setActiveTab }) {
   return (
-    <nav className="absolute bottom-0 left-0 right-0 z-20 border-t border-slate-100 bg-white/95 px-3 pb-4 pt-2 backdrop-blur">
+    <nav className="absolute bottom-3 left-4 right-4 z-20 rounded-[28px] border border-slate-100 bg-white/95 px-2 py-2 shadow-card backdrop-blur">
       <div className="grid grid-cols-5 gap-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -886,9 +737,7 @@ function BottomTabs({ activeTab, setActiveTab }) {
           return (
             <button
               key={tab.id}
-              className={`flex h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[11px] font-black transition ${
-                active ? "bg-mint/10 text-mint" : "text-slate-400"
-              }`}
+              className={`flex h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[11px] font-black transition ${active ? "bg-mint/10 text-mint" : "text-sub"}`}
               type="button"
               onClick={() => setActiveTab(tab.id)}
             >
@@ -905,7 +754,7 @@ function BottomTabs({ activeTab, setActiveTab }) {
 function ScreenFrame({ children }) {
   return (
     <div className="min-h-screen bg-[#EEF3F7] font-sans text-ink">
-      <div className="mx-auto min-h-[100dvh] w-full max-w-[430px] overflow-hidden bg-white shadow-2xl sm:my-6 sm:min-h-[860px] sm:rounded-[34px]">
+      <div className="mx-auto min-h-[100dvh] w-full max-w-[430px] overflow-hidden bg-bg shadow-2xl sm:my-6 sm:min-h-[860px] sm:rounded-[34px]">
         <div className="relative min-h-[100dvh] sm:min-h-[860px]">{children}</div>
       </div>
     </div>
@@ -916,34 +765,19 @@ function PagePadding({ children }) {
   return <div className="px-5 pb-6 pt-6">{children}</div>;
 }
 
-function BrandMark() {
-  return (
-    <div className="flex items-center gap-2">
-      <BrandIcon />
-      <div>
-        <span className="block text-[22px] font-black leading-none text-ink">나다움</span>
-        <span className="mt-1 block text-[11px] font-bold text-slate-400">나답게, 함께 성장하는 청년 커뮤니티</span>
-      </div>
-    </div>
-  );
-}
-
-function BrandIcon({ size = "normal" }) {
-  const box = size === "large" ? "h-20 w-20 rounded-[26px]" : "h-11 w-11 rounded-2xl";
-  const iconSize = size === "large" ? 36 : 22;
-  return (
-    <div className={`flex shrink-0 items-center justify-center bg-mint text-white shadow-lift ${box}`}>
-      <Sparkles size={iconSize} />
-    </div>
-  );
+function TopLogo() {
+  return <img className="h-11 w-32 object-contain" src={LOGO_SRC} alt="나다움" />;
 }
 
 function TopBar({ title, subtitle }) {
   return (
-    <header className="flex items-center justify-between">
-      <div>
+    <header className="flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <div className="mb-2 flex items-center gap-2">
+          <img className="h-7 w-20 object-contain" src={LOGO_SRC} alt="나다움" />
+        </div>
         <h1 className="text-[25px] font-black text-ink">{title}</h1>
-        <p className="mt-1 text-sm font-bold text-slate-400">{subtitle}</p>
+        <p className="mt-1 text-sm font-bold text-sub">{subtitle}</p>
       </div>
       <button className="icon-btn" type="button" aria-label="알림">
         <Bell size={19} />
@@ -960,7 +794,7 @@ function VerifyRow({ icon: Icon, title, desc, done, color }) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="font-black text-ink">{title}</p>
-        <p className="mt-1 text-sm font-semibold text-slate-400">{desc}</p>
+        <p className="mt-1 text-sm font-semibold text-sub">{desc}</p>
       </div>
     </div>
   );
@@ -972,9 +806,7 @@ function SegmentedTabs({ items, active, onChange }) {
       {items.map((item) => (
         <button
           key={item}
-          className={`h-10 shrink-0 rounded-full px-4 text-sm font-black transition ${
-            active === item ? "bg-mint text-white shadow-lift" : "bg-white text-slate-500 shadow-sm"
-          }`}
+          className={`h-10 shrink-0 rounded-full px-4 text-sm font-black transition ${active === item ? "bg-mint text-white shadow-lift" : "bg-white text-sub shadow-sm"}`}
           type="button"
           onClick={() => onChange(item)}
         >
@@ -989,7 +821,7 @@ function SectionHeader({ title, action, onClick }) {
   return (
     <div className="mb-3 mt-7 flex items-center justify-between">
       <h2 className="text-lg font-black text-ink">{title}</h2>
-      <button className="flex items-center text-sm font-black text-slate-400" type="button" onClick={onClick}>
+      <button className="flex items-center text-sm font-black text-sub" type="button" onClick={onClick}>
         {action}
         <ChevronRight size={16} />
       </button>
@@ -1001,24 +833,20 @@ function SectionTitle({ title, action }) {
   return (
     <div className="flex items-center justify-between">
       <h2 className="text-lg font-black text-ink">{title}</h2>
-      {action && <span className="text-sm font-black text-slate-400">{action}</span>}
+      {action && <span className="text-sm font-black text-sub">{action}</span>}
     </div>
   );
 }
 
 function ActionPanel({ icon: Icon, title, desc, color, onClick }) {
   return (
-    <button
-      className="flex w-full items-center gap-4 rounded-3xl bg-white p-4 text-left shadow-card"
-      type="button"
-      onClick={onClick}
-    >
+    <button className="flex w-full items-center gap-4 rounded-3xl bg-white p-4 text-left shadow-card" type="button" onClick={onClick}>
       <div className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl ${colorClass[color].soft} ${colorClass[color].text}`}>
         <Icon size={24} />
       </div>
       <div className="min-w-0 flex-1">
         <p className="font-black text-ink">{title}</p>
-        <p className="mt-1 text-sm font-semibold leading-5 text-slate-500">{desc}</p>
+        <p className="mt-1 text-sm font-semibold leading-5 text-sub">{desc}</p>
       </div>
       <ChevronRight className="text-slate-300" size={18} />
     </button>
@@ -1028,10 +856,7 @@ function ActionPanel({ icon: Icon, title, desc, color, onClick }) {
 function ProgressBar({ value, color = "mint" }) {
   return (
     <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-100">
-      <div
-        className={`h-full rounded-full ${colorClass[color].bg}`}
-        style={{ width: `${Math.min(value, 100)}%` }}
-      />
+      <div className={`h-full rounded-full ${colorClass[color].bg}`} style={{ width: `${Math.min(value, 100)}%` }} />
     </div>
   );
 }
@@ -1040,18 +865,14 @@ function MiniStat({ label, value }) {
   return (
     <div className="rounded-2xl bg-white/80 p-3 text-center shadow-sm">
       <p className="text-base font-black text-ink">{value}</p>
-      <p className="mt-1 text-[11px] font-black text-slate-400">{label}</p>
+      <p className="mt-1 text-[11px] font-black text-sub">{label}</p>
     </div>
   );
 }
 
 function MenuRow({ icon: Icon, label, color, onClick }) {
   return (
-    <button
-      className="flex w-full items-center gap-4 rounded-3xl bg-white p-4 text-left shadow-card"
-      type="button"
-      onClick={onClick}
-    >
+    <button className="flex w-full items-center gap-4 rounded-3xl bg-white p-4 text-left shadow-card" type="button" onClick={onClick}>
       <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${colorClass[color].soft} ${colorClass[color].text}`}>
         <Icon size={22} />
       </div>
@@ -1061,9 +882,9 @@ function MenuRow({ icon: Icon, label, color, onClick }) {
   );
 }
 
-function TagCloud() {
+function TagCloud({ className = "mt-4" }) {
   return (
-    <div className="mt-4 flex flex-wrap gap-2">
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {profileTags.map((tag, index) => {
         const color = ["mint", "blue", "purple", "yellow", "coral"][index];
         return (
@@ -1076,11 +897,10 @@ function TagCloud() {
   );
 }
 
-function AvatarBubble({ color, label }) {
+function AvatarBubble({ icon: Icon, color }) {
   return (
     <div className={`flex h-16 w-16 items-center justify-center rounded-full ${colorClass[color].soft} ${colorClass[color].text} shadow-card`}>
-      <UsersRound size={25} />
-      <span className="sr-only">{label}</span>
+      <Icon size={25} />
     </div>
   );
 }
@@ -1093,6 +913,10 @@ function MapPinBubble({ label, color, className }) {
       </div>
     </div>
   );
+}
+
+function PastelBlob({ className }) {
+  return <div className={`absolute rounded-full blur-[1px] ${className}`} />;
 }
 
 createRoot(document.getElementById("root")).render(<App />);

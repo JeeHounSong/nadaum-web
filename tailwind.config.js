@@ -51,7 +51,9 @@ export default {
         purple: "#A78BFA",
         coral: "#FF7D7D",
         yellow: "#FFC857",
-        ink: "#17202A",
+        ink: "#0F172A",
+        sub: "#64748B",
+        bg: "#FAFAF7",
       },
       boxShadow: {
         soft: "0 18px 45px rgba(30, 42, 62, 0.10)",
