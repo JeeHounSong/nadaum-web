@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Award,
@@ -292,18 +292,66 @@ function App() {
   const [posts, setPosts] = useState(initialPosts);
   const [customMeetups, setCustomMeetups] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [profile, setProfile] = useState({
+    nickname: "이나담",
+    region: "서울특별시 강서구",
+    intro: "나다움을 찾아가는 중 🌱",
+    tags: profileTags,
+  });
+  const [levelState, setLevelState] = useState({ level: 23, xp: 1240, maxXp: 2000 });
+  const [activityLog, setActivityLog] = useState([
+    { id: 1, date: "6/21", text: "한강 저녁 산책 모임에 참여했어요." },
+    { id: 2, date: "6/21", text: "커뮤니티에 글을 작성했어요." },
+    { id: 3, date: "6/20", text: "청년 월세 지원을 저장했어요." },
+    { id: 4, date: "6/20", text: "심리테스트를 완료했어요." },
+    { id: 5, date: "6/19", text: "댓글을 작성했어요." },
+  ]);
+  const [toast, setToast] = useState(null);
   const meetups = useMemo(() => [...customMeetups, ...meetupItems], [customMeetups]);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = setTimeout(() => setToast(null), 2200);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const addActivity = (text) => {
+    setActivityLog((prev) => [{ id: Date.now(), date: "6/21", text }, ...prev]);
+  };
+
+  const addXp = (label, amount) => {
+    setLevelState((prev) => {
+      let nextLevel = prev.level;
+      let nextXp = prev.xp + amount;
+      let nextMax = prev.maxXp;
+      let message = `${label} +${amount}XP`;
+      while (nextXp >= nextMax) {
+        nextXp -= nextMax;
+        nextLevel += 1;
+        nextMax += 200;
+        message = `Lv.${nextLevel} 달성! 나다움이 한 단계 성장했어요.`;
+      }
+      setToast(message);
+      return { level: nextLevel, xp: nextXp, maxXp: nextMax };
+    });
+  };
 
   const user = useMemo(
     () => ({
-      name: verified ? "이나담" : "게스트",
+      name: verified ? profile.nickname : "게스트",
       badge: verified ? "청년 인증 완료" : "인증 대기",
-      level: "Lv.23",
+      level: `Lv.${levelState.level}`,
+      xp: levelState.xp,
+      maxXp: levelState.maxXp,
+      xpPercent: Math.min((levelState.xp / levelState.maxXp) * 100, 100),
+      region: profile.region,
+      intro: profile.intro,
+      tags: profile.tags,
       joinedCount: joinedMeetups.length,
       savedCount: savedSupports.length,
       moodResult,
     }),
-    [verified, joinedMeetups.length, savedSupports.length, moodResult],
+    [verified, profile, levelState, joinedMeetups.length, savedSupports.length, moodResult],
   );
 
   const navigateDetail = (next) => setDetail(next);
@@ -337,6 +385,14 @@ function App() {
     setCustomMeetups,
     darkMode,
     setDarkMode,
+    profile,
+    setProfile,
+    levelState,
+    activityLog,
+    addActivity,
+    addXp,
+    toast,
+    setToast,
     user,
   };
 
@@ -441,6 +497,9 @@ function MobileShell(props) {
     myMeetups: MyMeetupsScreen,
     savedSupports: SavedSupportsScreen,
     profileDetail: ProfileDetailScreen,
+    editProfile: EditProfileScreen,
+    notifications: NotificationsScreen,
+    activityLog: ActivityLogScreen,
     psychTest: PsychTestScreen,
   };
   const Screen = props.detail ? detailScreens[props.detail.type] : mainScreens[props.activeTab] || HomeScreen;
@@ -454,6 +513,7 @@ function MobileShell(props) {
         </main>
         {showTabs && <BottomTabs activeTab={props.activeTab} setActiveTab={props.setActiveTab} onPlus={() => props.setOverlay("actions")} />}
         <Overlay {...props} />
+        {props.toast && <Toast message={props.toast} />}
       </div>
     </ScreenFrame>
   );
@@ -475,15 +535,15 @@ function HomeScreen({ user, moodResult, joinedMeetups, setActiveTab, setDetail, 
 
   return (
     <PagePadding>
-      <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} />
+      <TopBar title="나다움" subtitle={`${user.name}님의 오늘`} onNotify={() => setDetail({ type: "notifications" })} />
       <button className="mt-4 w-full overflow-hidden rounded-[28px] bg-gradient-to-br from-mint to-blue p-4 text-left text-white shadow-lift" type="button" onClick={() => setDetail({ type: "profileDetail" })}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-lg font-black">오늘도 반가워요, 이나담님 🙂</p>
-            <p className="mt-2 text-sm font-black text-white/90">나다움 레벨 23</p>
-            <p className="mt-1 text-xs font-bold text-white/80">1,240 / 2,000 XP</p>
+            <p className="text-lg font-black">오늘도 반가워요, {user.name}님 🙂</p>
+            <p className="mt-2 text-sm font-black text-white/90">나다움 {user.level}</p>
+            <p className="mt-1 text-xs font-bold text-white/80">{user.xp.toLocaleString()} / {user.maxXp.toLocaleString()} XP</p>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/30">
-              <div className="h-full w-[62%] rounded-full bg-white" />
+              <div className="h-full rounded-full bg-white" style={{ width: `${user.xpPercent}%` }} />
             </div>
           </div>
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-white/25 text-white">
@@ -623,7 +683,7 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
 
   return (
     <PagePadding>
-      <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" />
+      <TopBar title="커뮤니티" subtitle="동네 청년들과 가볍게 소통해요" onNotify={() => setDetail({ type: "notifications" })} />
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
       <div className="mt-4 space-y-2.5">
         {visiblePosts.length === 0 ? <EmptyCard image={A.emptySearch} text="검색 결과가 없어요" darkMode={darkMode} onClick={() => setCategory("전체")} /> : visiblePosts.map((post) => {
@@ -657,7 +717,7 @@ function CommunityScreen({ likedPosts, setLikedPosts, posts, setDetail, setOverl
   );
 }
 
-function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, setLikedPosts, darkMode }) {
+function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, setLikedPosts, darkMode, addActivity, addXp }) {
   const post = posts.find((item) => item.id === detail.postId);
   const [comment, setComment] = useState("");
   if (!post) return <DetailPage title="게시글" onBack={goBack}><EmptyCard image={A.emptySearch} text="게시글을 찾을 수 없어요" darkMode={darkMode} /></DetailPage>;
@@ -667,6 +727,8 @@ function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, se
     const text = comment.trim();
     if (!text) return;
     setPosts((prev) => prev.map((item) => item.id === post.id ? { ...item, comments: item.comments + 1, commentList: [...(item.commentList || []), text] } : item));
+    addActivity("댓글을 작성했어요.");
+    addXp("댓글 작성", 5);
     setComment("");
   };
   return (
@@ -709,15 +771,20 @@ function CommunityDetailScreen({ detail, posts, setPosts, goBack, likedPosts, se
   );
 }
 
-function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, darkMode }) {
+function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, darkMode, addActivity, addXp }) {
   const [filter, setFilter] = useState("전체");
   const filters = ["전체", "온라인", "오프라인", "스터디", "운동", "게임"];
   const visibleMeetups = filter === "전체" ? meetups : meetups.filter((item) => item.type === filter || item.tags.includes(filter));
-  const toggleJoin = (id) => setJoinedMeetups((prev) => (prev.includes(id) ? prev.filter((meetupId) => meetupId !== id) : [...prev, id]));
+  const toggleJoin = (meetup) => setJoinedMeetups((prev) => {
+    const joined = prev.includes(meetup.id);
+    addActivity(`${meetup.title} 모임 ${joined ? "참여를 취소했어요." : "에 참여했어요."}`);
+    if (!joined) addXp("모임 참여", 20);
+    return joined ? prev.filter((meetupId) => meetupId !== meetup.id) : [...prev, meetup.id];
+  });
 
   return (
     <PagePadding>
-      <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" />
+      <TopBar title="모임" subtitle="편하게 들어갈 수 있는 자리" onNotify={() => setDetail({ type: "notifications" })} />
       <section className="mt-4 overflow-hidden rounded-[24px] bg-white shadow-card">
         <img className="w-full object-cover" src={A.safe} alt="나다움 안전 모임" />
       </section>
@@ -748,7 +815,7 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
                   <h2 className="mt-1.5 text-base font-black text-ink">{meetup.title}</h2>
                   <p className="mt-1 flex items-center gap-1 text-xs font-bold text-sub"><MapPin size={13} />{meetup.place}</p>
                 </div>
-                <button className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-black ${joined ? "bg-ink text-white" : "bg-mint/10 text-mint"}`} type="button" onClick={(e) => { e.stopPropagation(); toggleJoin(meetup.id); }}>{joined ? "참여중" : "참여"}</button>
+                <button className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-black ${joined ? "bg-ink text-white" : "bg-mint/10 text-mint"}`} type="button" onClick={(e) => { e.stopPropagation(); toggleJoin(meetup); }}>{joined ? "참여중" : "참여"}</button>
               </div>
               <ProgressBar value={(count / meetup.max) * 100} color={meetup.color} compact />
               <p className="mt-2 text-xs font-black text-sub">{count}명 / {meetup.max}명</p>
@@ -760,12 +827,17 @@ function MeetupsScreen({ joinedMeetups, setJoinedMeetups, setDetail, meetups, da
   );
 }
 
-function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, meetups, darkMode }) {
+function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, meetups, darkMode, addActivity, addXp }) {
   const meetup = meetups.find((item) => item.id === detail.meetupId);
   if (!meetup) return <DetailPage title="모임 상세" onBack={goBack}><EmptyCard image={A.emptySearch} text="모임을 찾을 수 없어요" darkMode={darkMode} /></DetailPage>;
   const joined = joinedMeetups.includes(meetup.id);
   const count = meetup.count + (joined ? 1 : 0);
-  const toggleJoin = () => setJoinedMeetups((prev) => (prev.includes(meetup.id) ? prev.filter((id) => id !== meetup.id) : [...prev, meetup.id]));
+  const toggleJoin = () => setJoinedMeetups((prev) => {
+    const alreadyJoined = prev.includes(meetup.id);
+    addActivity(`${meetup.title} 모임 ${alreadyJoined ? "참여를 취소했어요." : "에 참여했어요."}`);
+    if (!alreadyJoined) addXp("모임 참여", 20);
+    return alreadyJoined ? prev.filter((id) => id !== meetup.id) : [...prev, meetup.id];
+  });
   return (
     <DetailPage title="모임 상세" onBack={goBack}>
       <section className="overflow-hidden rounded-[28px] bg-white shadow-card">
@@ -793,15 +865,25 @@ function MeetingDetailScreen({ detail, joinedMeetups, setJoinedMeetups, goBack, 
   );
 }
 
-function SupportScreen({ savedSupports, setSavedSupports, setDetail }) {
+function SupportScreen({ savedSupports, setSavedSupports, setDetail, addActivity, addXp }) {
   const [category, setCategory] = useState("주거");
   const categories = ["주거", "취업", "마음", "교육"];
   const ordered = supportItems.filter((item) => item.category === category).concat(supportItems.filter((item) => item.category !== category));
-  const toggleSave = (id) => setSavedSupports((prev) => (prev.includes(id) ? prev.filter((supportId) => supportId !== id) : [...prev, id]));
+  const toggleSave = (id) => {
+    const support = supportItems.find((item) => item.id === id);
+    setSavedSupports((prev) => {
+      const saved = prev.includes(id);
+      if (!saved && support) {
+        addActivity(`${support.title} 지원을 저장했어요.`);
+        addXp("청년지원 저장", 10);
+      }
+      return saved ? prev.filter((supportId) => supportId !== id) : [...prev, id];
+    });
+  };
 
   return (
     <PagePadding>
-      <TopBar title="청년지원" subtitle="내 상황에 맞춘 정책과 혜택" />
+      <TopBar title="청년지원" subtitle="내 상황에 맞춘 정책과 혜택" onNotify={() => setDetail({ type: "notifications" })} />
       <div className="mt-4 flex h-[48px] items-center gap-3 rounded-2xl bg-white px-4 text-sub shadow-card"><Search size={18} /><span className="text-sm font-bold">주거, 취업, 상담 검색</span></div>
       <SegmentedTabs items={categories} active={category} onChange={setCategory} />
       <div className="mt-4 space-y-2.5">
@@ -830,11 +912,18 @@ function SupportScreen({ savedSupports, setSavedSupports, setDetail }) {
   );
 }
 
-function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack, darkMode }) {
+function SupportDetailScreen({ detail, savedSupports, setSavedSupports, goBack, darkMode, addActivity, addXp }) {
   const support = supportItems.find((item) => item.id === detail.supportId);
   if (!support) return <DetailPage title="청년지원 상세" onBack={goBack}><EmptyState image={A.emptySearch} title="지원 정보를 찾을 수 없어요" desc="다시 목록에서 선택해주세요." darkMode={darkMode} /></DetailPage>;
   const saved = savedSupports.includes(support.id);
-  const toggleSave = () => setSavedSupports((prev) => (prev.includes(support.id) ? prev.filter((id) => id !== support.id) : [...prev, support.id]));
+  const toggleSave = () => setSavedSupports((prev) => {
+    const saved = prev.includes(support.id);
+    if (!saved) {
+      addActivity(`${support.title} 지원을 저장했어요.`);
+      addXp("청년지원 저장", 10);
+    }
+    return saved ? prev.filter((id) => id !== support.id) : [...prev, support.id];
+  });
   return (
     <DetailPage title="청년지원 상세" onBack={goBack}>
       <section className={`overflow-hidden rounded-[28px] border bg-white shadow-card ${colorClass[support.color].border}`}>
@@ -909,7 +998,7 @@ function SavedSupportsScreen({ savedSupports, setDetail, goBack, darkMode, setAc
   );
 }
 
-function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMode }) {
+function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMode, activityLog }) {
   const records = [
     { label: "모임 참여", value: 12, color: "mint" },
     { label: "온라인 모임", value: 18, color: "blue" },
@@ -918,14 +1007,14 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
   ];
   return (
     <PagePadding>
-      <TopBar title="마이페이지" subtitle="내 활동과 인증" />
+      <TopBar title="마이페이지" subtitle="내 활동과 인증" onNotify={() => setDetail({ type: "notifications" })} />
       <button className="mt-4 w-full rounded-[26px] bg-white p-4 text-left shadow-card" type="button" onClick={() => setDetail({ type: "profileDetail" })}>
         <div className="flex items-center gap-3">
           <img className="h-16 w-16 rounded-[22px] object-cover shadow-lift ring-4 ring-mint/10" src={avatars[5]} alt="프로필" />
           <div>
-            <div className="flex items-center gap-2"><h2 className="text-xl font-black text-ink">이나담</h2><span className="rounded-full bg-mint/10 px-2 py-0.5 text-xs font-black text-mint">{user.level}</span></div>
+            <div className="flex items-center gap-2"><h2 className="text-xl font-black text-ink">{user.name}</h2><span className="rounded-full bg-mint/10 px-2 py-0.5 text-xs font-black text-mint">{user.level}</span></div>
             <p className="mt-1 text-sm font-bold text-sub">{verified ? "청년 인증 완료" : user.badge}</p>
-            <p className="mt-1 text-xs font-bold text-mint">나다움을 찾아가는 중</p>
+            <p className="mt-1 text-xs font-bold text-mint">{user.intro}</p>
           </div>
         </div>
       </button>
@@ -938,6 +1027,7 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
         <SectionTitle title="성장 배지" action="14개" />
         <div className="mt-3 grid grid-cols-5 gap-2">{badges.map((badge) => { const Icon = badge.icon; return <div key={badge.label} className="text-center"><div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full ${colorClass[badge.color].soft} ${colorClass[badge.color].text} ring-2 ${colorClass[badge.color].ring}`}><Icon size={20} /></div><p className="mt-1.5 text-[10px] font-black leading-3 text-slate-600">{badge.label}</p></div>; })}</div>
       </section>
+      <RecentActivityCard items={activityLog.slice(0, 5)} onMore={() => setDetail({ type: "activityLog" })} />
       <div className="mt-3 space-y-2.5">
         <MenuRow icon={BookOpenCheck} label={user.moodResult ? `심리테스트 결과: ${user.moodResult}` : "심리테스트 하기"} color="purple" image={A.mental} onClick={() => setDetail({ type: "psychTest" })} />
         <MenuRow icon={UsersRound} label="내가 참여한 모임" color="blue" onClick={() => setDetail({ type: "myMeetups" })} />
@@ -952,7 +1042,7 @@ function MyPageScreen({ user, verified, setStage, setDetail, darkMode, setDarkMo
   );
 }
 
-function ProfileDetailScreen({ user, verified, goBack, setStage, joinedMeetups, savedSupports, posts, moodResult }) {
+function ProfileDetailScreen({ user, verified, goBack, setStage, setDetail, joinedMeetups, savedSupports, posts, moodResult, activityLog }) {
   const commentCount = posts.reduce((sum, post) => sum + (post.comments || 0), 0);
   const stats = [
     { label: "참여 모임", value: joinedMeetups.length, color: "mint" },
@@ -964,15 +1054,15 @@ function ProfileDetailScreen({ user, verified, goBack, setStage, joinedMeetups, 
     <DetailPage title="내 프로필" onBack={goBack}>
       <section className="rounded-[28px] bg-white p-5 text-center shadow-card">
         <img className="mx-auto h-24 w-24 rounded-[30px] object-cover shadow-lift ring-4 ring-mint/10" src={avatars[5]} alt="이나담 프로필" />
-        <h1 className="mt-4 text-2xl font-black text-ink">이나담</h1>
+        <h1 className="mt-4 text-2xl font-black text-ink">{user.name}</h1>
         <p className="mt-1 text-sm font-bold text-sub">{verified ? "청년 인증 완료" : user.badge}</p>
         <div className="mx-auto mt-3 inline-flex rounded-full bg-mint/10 px-3 py-1 text-xs font-black text-mint">나다움 레벨 {user.level}</div>
-        <p className="mt-4 text-xs font-bold text-sub">1,240 / 2,000 XP</p>
-        <ProgressBar value={62} color="mint" />
+        <p className="mt-4 text-xs font-bold text-sub">{user.xp.toLocaleString()} / {user.maxXp.toLocaleString()} XP</p>
+        <ProgressBar value={user.xpPercent} color="mint" />
       </section>
       <section className="rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="나다움 지도 태그" />
-        <TagCloud className="mt-3" />
+        <div className="mt-3 flex flex-wrap gap-2">{user.tags.map((tag, index) => <Tag key={tag} color={["mint", "blue", "purple", "yellow", "coral"][index % 5]}>{tag}</Tag>)}</div>
       </section>
       <section className="rounded-[24px] bg-white p-4 shadow-card">
         <SectionTitle title="심리테스트 결과" />
@@ -1005,15 +1095,102 @@ function ProfileDetailScreen({ user, verified, goBack, setStage, joinedMeetups, 
           })}
         </div>
       </section>
+      <RecentActivityCard items={activityLog.slice(0, 5)} onMore={() => setDetail({ type: "activityLog" })} />
       <div className="grid grid-cols-2 gap-2">
-        <button className="secondary-btn" type="button">프로필 수정</button>
+        <button className="secondary-btn" type="button" onClick={() => setDetail({ type: "editProfile" })}>프로필 수정</button>
         <button className="primary-btn mint-btn" type="button" onClick={() => setStage("onboarding")}>청년 인증 다시 보기</button>
       </div>
     </DetailPage>
   );
 }
 
-function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail }) {
+function EditProfileScreen({ user, profile, setProfile, goBack, setDetail, addActivity, addXp, setToast }) {
+  const allTags = ["재학생", "자취중", "취업준비", "영상편집", "운동시작", "독서", "러닝", "게임", "커피챗"];
+  const [draft, setDraft] = useState({
+    nickname: profile.nickname,
+    region: profile.region,
+    intro: profile.intro,
+    tags: profile.tags,
+  });
+  const update = (key, value) => setDraft((prev) => ({ ...prev, [key]: value }));
+  const toggleTag = (tag) => setDraft((prev) => ({
+    ...prev,
+    tags: prev.tags.includes(tag) ? prev.tags.filter((item) => item !== tag) : [...prev.tags, tag],
+  }));
+  const save = () => {
+    setProfile({
+      nickname: draft.nickname.trim() || user.name,
+      region: draft.region.trim() || "서울특별시 강서구",
+      intro: draft.intro.trim() || "나다움을 찾아가는 중 🌱",
+      tags: draft.tags.length ? draft.tags : profileTags,
+    });
+    addActivity("프로필을 수정했어요.");
+    addXp("프로필이 저장되었어요. 프로필 수정", 5);
+    setDetail({ type: "profileDetail" });
+  };
+  return (
+    <DetailPage title="프로필 수정" onBack={goBack}>
+      <section className="rounded-[28px] bg-white p-5 text-center shadow-card">
+        <img className="mx-auto h-24 w-24 rounded-[30px] object-cover shadow-lift ring-4 ring-mint/10" src={avatars[5]} alt="프로필 이미지" />
+        <p className="mt-3 text-xs font-black text-sub">나다움 프로필</p>
+      </section>
+      <section className="space-y-3 rounded-[24px] bg-white p-4 shadow-card">
+        <input className="modal-input" value={draft.nickname} onChange={(e) => update("nickname", e.target.value)} placeholder="닉네임" />
+        <input className="modal-input" value={draft.region} onChange={(e) => update("region", e.target.value)} placeholder="지역" />
+        <textarea className="modal-input min-h-24 resize-none" value={draft.intro} onChange={(e) => update("intro", e.target.value)} placeholder="자기소개" />
+      </section>
+      <section className="rounded-[24px] bg-white p-4 shadow-card">
+        <SectionTitle title="관심사 태그" />
+        <div className="mt-3 flex flex-wrap gap-2">
+          {allTags.map((tag, index) => {
+            const active = draft.tags.includes(tag);
+            const color = ["mint", "blue", "purple", "yellow", "coral"][index % 5];
+            return <button key={tag} className={`rounded-full px-3 py-2 text-xs font-black ${active ? `${colorClass[color].bg} text-white` : "bg-slate-50 text-sub"}`} type="button" onClick={() => toggleTag(tag)}>{tag}</button>;
+          })}
+        </div>
+      </section>
+      <button className="primary-btn mint-btn" type="button" onClick={save}>저장하기</button>
+    </DetailPage>
+  );
+}
+
+function NotificationsScreen({ goBack, setDetail, posts }) {
+  const firstPost = posts[0] || initialPosts[0];
+  const alerts = [
+    { id: 1, category: "모임", title: "한강 저녁 산책 모임이 내일 진행됩니다.", desc: "여의나루역에서 19:00에 만나요.", time: "방금 전", unread: true, color: "mint", run: () => setDetail({ type: "meetingDetail", meetupId: "walk" }) },
+    { id: 2, category: "커뮤니티", title: "내 게시글에 댓글이 달렸습니다.", desc: "동네 청년이 새로운 답글을 남겼어요.", time: "12분 전", unread: true, color: "blue", run: () => setDetail({ type: "communityDetail", postId: firstPost.id }) },
+    { id: 3, category: "청년지원", title: "청년 월세 지원 신청 마감이 3일 남았습니다.", desc: "필요 서류를 미리 확인해보세요.", time: "1시간 전", unread: false, color: "purple", run: () => setDetail({ type: "supportDetail", supportId: 1 }) },
+    { id: 4, category: "레벨", title: "게시글 작성으로 10XP를 얻었어요.", desc: "나다움 레벨에 경험치가 반영됐어요.", time: "어제", unread: false, color: "yellow" },
+    { id: 5, category: "심리테스트", title: "오늘의 마음 상태를 다시 확인해보세요.", desc: "지금 나에게 맞는 연결 방식을 추천해드려요.", time: "어제", unread: false, color: "coral", run: () => setDetail({ type: "psychTest" }) },
+  ];
+  return (
+    <DetailPage title="알림" onBack={goBack}>
+      <div className="space-y-2.5">
+        {alerts.map((alert) => (
+          <button key={alert.id} className="w-full rounded-[24px] bg-white p-4 text-left shadow-card" type="button" onClick={alert.run}>
+            <div className="flex items-start justify-between gap-3">
+              <span className={`rounded-full px-2.5 py-1 text-[11px] font-black ${colorClass[alert.color].soft} ${colorClass[alert.color].text}`}>{alert.category}</span>
+              <span className={`rounded-full px-2 py-1 text-[10px] font-black ${alert.unread ? "bg-coral/10 text-coral" : "bg-slate-50 text-sub"}`}>{alert.unread ? "안읽음" : "읽음"}</span>
+            </div>
+            <h2 className="mt-3 text-base font-black leading-6 text-ink">{alert.title}</h2>
+            <p className="mt-1 text-sm font-semibold leading-5 text-sub">{alert.desc}</p>
+            <p className="mt-3 text-xs font-black text-slate-400">{alert.time}</p>
+          </button>
+        ))}
+      </div>
+    </DetailPage>
+  );
+}
+
+function ActivityLogScreen({ goBack, activityLog }) {
+  return (
+    <DetailPage title="활동 기록" onBack={goBack}>
+      <ActivityList items={activityLog} />
+    </DetailPage>
+  );
+}
+
+function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail, addActivity, addXp }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState(Array(psychQuestions.length).fill(null));
   const [result, setResult] = useState(null);
@@ -1040,7 +1217,7 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail }) {
           <div className="mt-3 space-y-2">{result.meetups.map((item) => <p key={item} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-black text-ink">{item}</p>)}</div>
         </section>
         <ActionPanel icon={WalletCards} title={result.support} desc="추천 청년지원 확인하기" color="coral" onClick={() => setActiveTab("support")} />
-        <button className="primary-btn mint-btn" type="button" onClick={() => { setMoodResult(result.title); setActiveTab("home"); setDetail(null); }}>홈에 반영하기</button>
+        <button className="primary-btn mint-btn" type="button" onClick={() => { setMoodResult(result.title); addActivity("심리테스트를 완료했어요."); addXp("심리테스트 완료", 15); setActiveTab("home"); setDetail(null); }}>홈에 반영하기</button>
         <button className="secondary-btn" type="button" onClick={() => { setResult(null); setStep(0); setAnswers(Array(psychQuestions.length).fill(null)); }}>다시 테스트하기</button>
       </DetailPage>
     );
@@ -1072,7 +1249,7 @@ function PsychTestScreen({ goBack, setMoodResult, setActiveTab, setDetail }) {
 }
 
 function Overlay(props) {
-  const { overlay, setOverlay, setDetail, setActiveTab, setPosts, setCustomMeetups } = props;
+  const { overlay, setOverlay, setDetail, setActiveTab, setPosts, setCustomMeetups, addActivity, addXp } = props;
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState("");
   const [meetupDraft, setMeetupDraft] = useState({
@@ -1101,6 +1278,8 @@ function Overlay(props) {
       const title = draftTitle.trim() || "새로운 나다움 이야기를 공유해요";
       const body = draftBody.trim() || "오늘의 기록을 남겼어요.";
       setPosts((prev) => [{ id: Date.now(), category: "자유", author: "이나담", avatar: avatars[5], time: "방금 전", title, body, likes: 0, comments: 0, color: "mint", commentList: [] }, ...prev]);
+      addActivity("커뮤니티에 글을 작성했어요.");
+      addXp("게시글 작성", 10);
       setDraftTitle("");
       setDraftBody("");
       setActiveTab("community");
@@ -1129,6 +1308,8 @@ function Overlay(props) {
         },
         ...prev,
       ]);
+      addActivity(`${title} 모임을 만들었어요.`);
+      addXp("모임 만들기", 20);
       setMeetupDraft({ title: "", type: "오프라인", date: "", place: "", max: "8", intro: "", tags: "" });
       setActiveTab("meetups");
       close();
@@ -1168,8 +1349,8 @@ function Overlay(props) {
           ))}
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <button className="secondary-btn" type="button" onClick={close}>확인</button>
-          <button className="primary-btn mint-btn" type="button" onClick={close}>내일도 참여하기</button>
+          <button className="secondary-btn" type="button" onClick={() => { addActivity("걸음수 챌린지 기록을 확인했어요."); addXp("걸음 기록 확인", 5); close(); }}>확인</button>
+          <button className="primary-btn mint-btn" type="button" onClick={() => { addActivity("걸음수 챌린지 기록을 확인했어요."); addXp("걸음 기록 확인", 5); close(); }}>내일도 참여하기</button>
         </div>
       </OverlayShell>
     );
@@ -1222,7 +1403,7 @@ function TopLogo() {
   return <img className="h-11 w-32 object-contain" src={A.logo} alt="나다움" />;
 }
 
-function TopBar({ title, subtitle }) {
+function TopBar({ title, subtitle, onNotify }) {
   return (
     <header className="flex items-center justify-between gap-3">
       <div className="min-w-0">
@@ -1230,7 +1411,7 @@ function TopBar({ title, subtitle }) {
         <h1 className="text-[24px] font-black text-ink">{title}</h1>
         <p className="mt-0.5 text-sm font-bold text-sub">{subtitle}</p>
       </div>
-      <button className="icon-btn" type="button" aria-label="알림"><Bell size={18} /></button>
+      <button className="icon-btn" type="button" aria-label="알림" onClick={onNotify}><Bell size={18} /></button>
     </header>
   );
 }
@@ -1263,6 +1444,34 @@ function SectionHeader({ title, action, onClick }) {
 
 function SectionTitle({ title, action }) {
   return <div className="flex items-center justify-between"><h2 className="text-base font-black text-ink">{title}</h2>{action && <span className="text-xs font-black text-sub">{action}</span>}</div>;
+}
+
+function RecentActivityCard({ items, onMore }) {
+  return (
+    <section className="mt-3 rounded-[24px] bg-white p-4 shadow-card">
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-black text-ink">최근 활동</h2>
+        <button className="flex items-center text-xs font-black text-sub" type="button" onClick={onMore}>더보기<ChevronRight size={15} /></button>
+      </div>
+      <ActivityList items={items} compact />
+    </section>
+  );
+}
+
+function ActivityList({ items, compact = false }) {
+  return (
+    <div className={`${compact ? "mt-3" : ""} space-y-2.5`}>
+      {items.map((item) => (
+        <div key={item.id} className="flex gap-3 rounded-2xl bg-slate-50 p-3">
+          <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-mint" />
+          <div className="min-w-0">
+            <p className="text-xs font-black text-mint">{item.date}</p>
+            <p className="mt-1 text-sm font-bold leading-5 text-ink">{item.text}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function ActionPanel({ icon: Icon, title, desc, color, onClick }) {
@@ -1366,6 +1575,14 @@ function OverlayShell({ title, onClose, children }) {
         <div className="mb-4 flex items-center justify-between"><h2 className="text-lg font-black text-ink">{title}</h2><button className="icon-btn" type="button" onClick={onClose} aria-label="닫기"><X size={18} /></button></div>
         <div className="space-y-3">{children}</div>
       </div>
+    </div>
+  );
+}
+
+function Toast({ message }) {
+  return (
+    <div className="pointer-events-none absolute left-5 right-5 top-5 z-50 flex justify-center">
+      <div className="rounded-full bg-ink px-4 py-3 text-sm font-black text-white shadow-2xl">{message}</div>
     </div>
   );
 }
